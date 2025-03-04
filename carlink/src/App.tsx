@@ -1,9 +1,12 @@
-import './App.css';
-import Navbar from './components/Navbar'
+import React from 'react';
+import CadastroUsuario from './pages/CadastroUsuario';
 
 function App() {
   return (
-    <Navbar></Navbar>
+    <div className="container mt-5">
+      <h1>Cadastro de Usuário</h1>
+      <CadastroUsuario />
+    </div>
   );
 }
 
