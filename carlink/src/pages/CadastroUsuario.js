@@ -5,7 +5,11 @@ function CadastroUsuario() {
     
     <form>
 <<<<<<< HEAD
+<<<<<<< HEAD
       <h1>Cadastro de Usuário</h1>
+=======
+      {/* Cadastro Email Usuario */}
+>>>>>>> 5d96436be53d43bc25954584f80b79c5218570f7
 =======
       {/* Cadastro Email Usuario */}
 >>>>>>> 5d96436be53d43bc25954584f80b79c5218570f7
