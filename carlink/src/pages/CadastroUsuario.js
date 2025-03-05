@@ -4,15 +4,7 @@ function CadastroUsuario() {
   return (
     
     <form>
-<<<<<<< HEAD
-<<<<<<< HEAD
-      <h1>Cadastro de Usuário</h1>
-=======
       {/* Cadastro Email Usuario */}
->>>>>>> 5d96436be53d43bc25954584f80b79c5218570f7
-=======
-      {/* Cadastro Email Usuario */}
->>>>>>> 5d96436be53d43bc25954584f80b79c5218570f7
       <div className="mb-3">
         <label htmlFor="exampleInputEmail1" className="form-label" >Email</label>
         <input
