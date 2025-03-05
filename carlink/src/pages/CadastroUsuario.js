@@ -2,33 +2,43 @@ import React from 'react';
 
 function CadastroUsuario() {
   return (
+    
     <form>
+      {/* Cadastro Email Usuario */}
       <div className="mb-3">
-        <label htmlFor="exampleInputEmail1" className="form-label">Email address</label>
+        <label htmlFor="exampleInputEmail1" className="form-label" >Email</label>
         <input
           type="email"
           className="form-control"
-          id="exampleInputEmail1"
-          aria-describedby="emailHelp"
+          id="inputEmailCadastroUsuario"
+          placeholder="exemplo@email.com"
         />
-        <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
       </div>
+
+      {/* Cadastro email Usuario */}
       <div className="mb-3">
-        <label htmlFor="exampleInputPassword1" className="form-label">Password</label>
+        <label htmlFor="inputPasswordCadastroUsuario" className="form-label">Password</label>
         <input
           type="password"
           className="form-control"
-          id="exampleInputPassword1"
+          id="inputPasswordCadastroUsuario"
+          aria-describedby="passwordHelp"
+          placeholder="********"
         />
+        <div id="passwordHelp" className="form-text">Senha de 8 a 16 dígitos.</div>
       </div>
+     
+     {/* Checkbox */}
       <div className="mb-3 form-check">
         <input
           type="checkbox"
           className="form-check-input"
           id="exampleCheck1"
         />
-        <label className="form-check-label" htmlFor="exampleCheck1">Check me out</label>
+        <label className="form-check-label" htmlFor="exampleCheck1">Concordo com os <a href="#">Termos de uso.</a></label>
       </div>
+      
+      {/* Botão */}
       <button type="submit" className="btn btn-primary">Submit</button>
     </form>
   );
