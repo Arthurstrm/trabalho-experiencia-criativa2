@@ -33,10 +33,7 @@ function CadastroCarro() {
                 <input type="text" className="form-control" id="chassi" />
             </div>
 
-            <div className="mb-3 form-check">
-                <input type="checkbox" className="form-check-input" id="veiculoFinanciado" />
-                <label className="form-check-label" htmlFor="veiculoFinanciado">Veículo financiado</label>
-            </div>
+
 
             <button type="submit" className="btn btn-primary">Cadastrar</button>
         </form>
