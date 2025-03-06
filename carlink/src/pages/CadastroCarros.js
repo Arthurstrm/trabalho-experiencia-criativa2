@@ -45,3 +45,4 @@ function CadastroCarro() {
 }
 
 export default CadastroCarro;
+{/*teste*/ }
