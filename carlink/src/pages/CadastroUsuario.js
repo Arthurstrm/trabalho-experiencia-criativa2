@@ -40,9 +40,7 @@ function CadastroUsuario() {
       return;
     }
 
-    // Se tudo estiver válido, prossegue com o cadastro
     alert('Cadastro realizado com sucesso!');
-    // Aqui você pode adicionar a lógica para enviar os dados do formulário
   };
 
   return (
