@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../img/logoCarlink-Escura.svg'; // Ajuste o caminho conforme necessário
 
 function Navbar() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="navbar navbar-expand-lg navbar-light bg-white">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
-          Minha Aplicação
+          <img src={logo} alt="Logo"  height="50" className="d-inline-block align-text-top" />
         </Link>
         <button
           className="navbar-toggler"
@@ -19,7 +20,7 @@ function Navbar() {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-        <div className="collapse navbar-collapse" id="navbarNavDropdown">
+        <div className="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
           <ul className="navbar-nav">
             <li className="nav-item">
               <Link className="nav-link" to="/cadastro-usuario">
@@ -36,13 +37,12 @@ function Navbar() {
                 Cadastro de Funcionário
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">
-                Login
-              </Link>
-            </li>
           </ul>
         </div>
+        {/* Ícone de login no canto direito */}
+        <Link className="nav-link ms-auto" to="/login">
+          <span className="material-icons">login</span>
+        </Link>
       </div>
     </nav>
   );
