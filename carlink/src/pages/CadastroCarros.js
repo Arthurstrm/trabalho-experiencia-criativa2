@@ -7,33 +7,55 @@ function CadastroCarro() {
                 <div className="col-md-6 col-lg-4">
                     <form>
                         <div className="mb-3">
-                            <label htmlFor="marca" className="form-label">Marca</label>
-                            <input type="text" className="form-control" id="marca" />
+                            <label htmlFor="marcaCarro" className="form-label">Marca</label>
+                            <input type="text" className="form-control" id="marcaCarro" placeholder="Ex: Toyota" />
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="modelo" className="form-label">Modelo</label>
-                            <input type="text" className="form-control" id="modelo" />
+                            <label htmlFor="modeloCarro" className="form-label">Modelo</label>
+                            <input type="text" className="form-control" id="modeloCarro" placeholder="Ex: Corolla" />
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="ano" className="form-label">Ano</label>
-                            <input type="number" className="form-control" id="ano" />
+                            <label htmlFor="anoCarro" className="form-label">Ano</label>
+                            <input type="number" className="form-control" id="anoCarro" placeholder="Ex: 2022" />
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="placa" className="form-label">Placa</label>
-                            <input type="text" className="form-control" id="placa" />
+                            <label htmlFor="placaCarro" className="form-label">Placa</label>
+                            <input type="text" className="form-control" id="placaCarro" placeholder="Ex: ABC-1234" />
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="renavam" className="form-label">RENAVAM</label>
-                            <input type="text" className="form-control" id="renavam" />
+                            <label htmlFor="renavamCarro" className="form-label">RENAVAM</label>
+                            <input type="text" className="form-control" id="renavamCarro" placeholder="Ex: 123456789" />
                         </div>
 
                         <div className="mb-3">
-                            <label htmlFor="chassi" className="form-label">Chassi</label>
-                            <input type="text" className="form-control" id="chassi" />
+                            <label htmlFor="chassiCarro" className="form-label">Chassi</label>
+                            <input type="text" className="form-control" id="chassiCarro" placeholder="Ex: 9BWZZZ377VT004251" />
+                        </div>
+
+                        <div className="mb-3">
+                            <label htmlFor="corCarro" className="form-label">Cor</label>
+                            <input type="text" className="form-control" id="corCarro" placeholder="Ex: Preto" />
+                        </div>
+
+                        <div className="mb-3">
+                            <label htmlFor="motorCarro" className="form-label">Motor</label>
+                            <select className="form-control" id="motorCarro">
+                                <option value="">Selecione</option>
+                                <option value="1.0">1.0</option>
+                                <option value="1.4">1.4</option>
+                                <option value="1.6">1.6</option>
+                                <option value="2.0">2.0</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+
+                        <div className="mb-3">
+                            <label htmlFor="potenciaCarro" className="form-label">Potência (CV)</label>
+                            <input type="number" className="form-control" id="potenciaCarro" placeholder="Ex: 120" />
                         </div>
 
                         <button type="submit" className="btn btn-primary">Cadastrar</button>
@@ -45,4 +67,3 @@ function CadastroCarro() {
 }
 
 export default CadastroCarro;
-{/*teste*/ }
