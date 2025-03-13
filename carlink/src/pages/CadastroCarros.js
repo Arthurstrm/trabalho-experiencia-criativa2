@@ -23,7 +23,7 @@ function CadastroCarro() {
 
                         <div className="mb-3">
                             <label htmlFor="placaCarro" className="form-label">Placa</label>
-                            <input type="text" className="form-control" id="placaCarro" placeholder="Ex: ABC-1234" />
+                            <input type="text" className="form-control" id="placaCarro" placeholder="Ex: ABC1D23" />
                         </div>
 
                         <div className="mb-3">
