@@ -48,6 +48,7 @@ function CadastroCarro() {
                                 <option value="1.0">1.0</option>
                                 <option value="1.4">1.4</option>
                                 <option value="1.6">1.6</option>
+                                <option value="1.8">1.8</option>
                                 <option value="2.0">2.0</option>
                                 <option value="Outros">Outros</option>
                             </select>
