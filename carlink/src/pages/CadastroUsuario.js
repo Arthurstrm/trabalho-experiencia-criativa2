@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 function CadastroUsuario() {
   // Estados
   const [senha, setSenha] = useState('');
+  const [repetirSenha, setRepetirSenha] = useState('');
   const [email, setEmail] = useState('');
   const [checkboxMarcada, setCheckboxMarcada] = useState(false);
   
   // Estados de erro
   const [erros, setErros] = useState({
     senha: '',
+    repetirSenha: '',
     email: '',
   });
 
@@ -16,6 +18,7 @@ function CadastroUsuario() {
   const MENSAGENS_ERRO = {
     SENHA_TAMANHO: 'A senha deve ter entre 8 e 16 caracteres.',
     SENHA_COMPLEXIDADE: 'A senha deve conter pelo menos uma letra maiúscula, um número e um símbolo.',
+    SENHA_NAO_CONFERE: 'As senhas não coincidem.',
     EMAIL_INVALIDO: 'Por favor, insira um email válido.',
     TERMOS_NAO_ACEITOS: 'Você deve concordar com os termos de uso para cadastrar.'
   };
@@ -37,6 +40,14 @@ function CadastroUsuario() {
     return '';
   };
 
+  // Validação de repetir senha
+  const validarRepetirSenha = (senha, repetirSenha) => {
+    if (senha !== repetirSenha) {
+      return MENSAGENS_ERRO.SENHA_NAO_CONFERE;
+    }
+    return '';
+  };
+
   // Validação de email
   const validarEmail = (email) => {
     if (!REGEX.EMAIL.test(email)) {
@@ -49,7 +60,20 @@ function CadastroUsuario() {
   const handleSenhaChange = (event) => {
     const novaSenha = event.target.value;
     setSenha(novaSenha);
-    setErros({...erros, senha: validarSenha(novaSenha)});
+    setErros({
+      ...erros,
+      senha: validarSenha(novaSenha),
+      repetirSenha: validarRepetirSenha(novaSenha, repetirSenha)
+    });
+  };
+
+  const handleRepetirSenhaChange = (event) => {
+    const novaRepetirSenha = event.target.value;
+    setRepetirSenha(novaRepetirSenha);
+    setErros({
+      ...erros,
+      repetirSenha: validarRepetirSenha(senha, novaRepetirSenha)
+    });
   };
 
   const handleEmailChange = (event) => {
@@ -68,11 +92,13 @@ function CadastroUsuario() {
 
     // Validações finais
     const senhaError = validarSenha(senha);
+    const repetirSenhaError = validarRepetirSenha(senha, repetirSenha);
     const emailError = validarEmail(email);
     
-    if (senhaError || emailError) {
+    if (senhaError || repetirSenhaError || emailError) {
       setErros({
         senha: senhaError,
+        repetirSenha: repetirSenhaError,
         email: emailError
       });
       return;
@@ -88,7 +114,7 @@ function CadastroUsuario() {
 
   // Helper para verificar se há erros
   const hasErrors = () => {
-    return erros.senha || erros.email;
+    return erros.senha || erros.repetirSenha || erros.email;
   };
 
   return (
@@ -115,30 +141,48 @@ function CadastroUsuario() {
             </div>
 
             {/* Campo de senha */}
-            <div className="mb-3">
+            <div className="mb-1"> {/* Alterado para mb-1 para reduzir espaço abaixo */}
               <label htmlFor="inputPasswordCadastroUsuario" className="form-label">Senha</label>
               <input
                 type="password"
                 className={`form-control ${erros.senha ? 'is-invalid' : ''}`}
                 id="inputPasswordCadastroUsuario"
-                aria-describedby="passwordHelp"
                 placeholder="********"
                 value={senha}
                 onChange={handleSenhaChange}
                 required
               />
-              <div id="passwordHelp" className="form-text">
-                A senha deve ter:
-                <ul>
-                  <li>8 a 16 caracteres</li>
-                  <li>Pelo menos uma letra maiúscula</li>
-                  <li>Pelo menos um número</li>
-                  <li>Pelo menos um símbolo</li>
-                </ul>
-              </div>
               {erros.senha && (
                 <small className="text-danger">{erros.senha}</small>
               )}
+            </div>
+
+            {/* Campo de repetir senha - POSICIONADO LOGO APÓS O CAMPO SENHA */}
+            <div className="mb-3">
+              <label htmlFor="inputRepetirPasswordCadastroUsuario" className="form-label">Repetir Senha</label>
+              <input
+                type="password"
+                className={`form-control ${erros.repetirSenha ? 'is-invalid' : ''}`}
+                id="inputRepetirPasswordCadastroUsuario"
+                placeholder="********"
+                value={repetirSenha}
+                onChange={handleRepetirSenhaChange}
+                required
+              />
+              {erros.repetirSenha && (
+                <small className="text-danger">{erros.repetirSenha}</small>
+              )}
+            </div>
+
+            {/* Texto de ajuda - MOVIDO PARA APÓS OS CAMPOS DE SENHA */}
+            <div id="passwordHelp" className="form-text mb-3">
+              A senha deve ter:
+              <ul className="mb-0"> {/* mb-0 para remover margem inferior padrão */}
+                <li>8 a 16 caracteres</li>
+                <li>Pelo menos uma letra maiúscula</li>
+                <li>Pelo menos um número</li>
+                <li>Pelo menos um símbolo</li>
+              </ul>
             </div>
 
             {/* Checkbox */}
