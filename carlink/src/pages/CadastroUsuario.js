@@ -141,7 +141,7 @@ function CadastroUsuario() {
             </div>
 
             {/* Campo de senha */}
-            <div className="mb-1"> 
+            <div className="mb-3"> 
               <label htmlFor="inputPasswordCadastroUsuario" className="form-label">Senha</label>
               <input
                 type="password"
