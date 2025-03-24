@@ -141,7 +141,7 @@ function CadastroUsuario() {
             </div>
 
             {/* Campo de senha */}
-            <div className="mb-1"> {/* Alterado para mb-1 para reduzir espaço abaixo */}
+            <div className="mb-1"> 
               <label htmlFor="inputPasswordCadastroUsuario" className="form-label">Senha</label>
               <input
                 type="password"
@@ -157,7 +157,7 @@ function CadastroUsuario() {
               )}
             </div>
 
-            {/* Campo de repetir senha - POSICIONADO LOGO APÓS O CAMPO SENHA */}
+            {/* Campo de repetir senha */}
             <div className="mb-3">
               <label htmlFor="inputRepetirPasswordCadastroUsuario" className="form-label">Repetir Senha</label>
               <input
