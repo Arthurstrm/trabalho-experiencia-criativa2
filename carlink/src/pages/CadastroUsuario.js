@@ -49,9 +49,6 @@ function CadastroUsuario() {
 
   /**
    * Valida se as senhas coincidem
-   * @param {string} senha - Senha original
-   * @param {string} repetirSenha - Confirmação de senha
-   * @returns {string} Mensagem de erro ou string vazia se válida
    * Chamado em: handleSenhaChange, handleRepetirSenhaChange e handleSubmit
    */
   const validarRepetirSenha = (senha, repetirSenha) => {
