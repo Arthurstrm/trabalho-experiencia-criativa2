@@ -27,13 +27,19 @@ function CadastroCarro() {
         return /^[A-Za-zÀ-ÿ\s]+$/.test(cor);
     };
 
+    const validarAno = (ano) => {
+        const anoNum = parseInt(ano, 10);
+        const anoAtual = new Date().getFullYear();
+        return !isNaN(anoNum) && anoNum >= 1970 && anoNum <= anoAtual;
+    };
+
     const validarFormulario = () => {
         if (!form.marca || !form.modelo || !form.ano || !form.placa || !form.renavam || !form.chassi || !form.cor || !form.motor || !form.potencia) {
             alert("Todos os campos devem ser preenchidos!");
             return false;
         }
-        if (isNaN(form.ano) || form.ano.length !== 4) {
-            alert("Ano deve conter 4 dígitos numéricos!");
+        if (!validarAno(form.ano)) {
+            alert("Ano deve estar entre 1970 e o ano atual!");
             return false;
         }
         if (!/^[0-9]{9,11}$/.test(form.renavam)) {
