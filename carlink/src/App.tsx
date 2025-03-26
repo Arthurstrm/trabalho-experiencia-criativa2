@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import CadastroUsuario from './pages/CadastroUsuario';
 import CadastroCarros from './pages/CadastroCarros';
 import CadastroFuncionario from './pages/CadastroFuncionario';
-// import Login from './pages/Login';
+import Login from './pages/Login';
 
 function App() {
   return (
@@ -14,7 +14,7 @@ function App() {
         <Route path="/cadastro-usuario" element={<CadastroUsuario />} />
         <Route path="/cadastro-carros" element={<CadastroCarros />} />
         <Route path="/cadastro-funcionario" element={<CadastroFuncionario />} />
-        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );
