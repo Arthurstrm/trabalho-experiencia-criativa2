@@ -107,6 +107,13 @@ function CadastroFuncionario() {
     }
     if (!form.dataNascimento) {
       novosErros.dataNascimento = "Por favor, preencha a data de nascimento.";
+    } else {
+      const dataNascimento = new Date(form.dataNascimento);
+      const hoje = new Date();
+      
+      if (dataNascimento > hoje) {
+        novosErros.dataNascimento = "A data de nascimento inválida.";
+      }
     }
     if (!validarCPF(form.cpf)) {
       novosErros.cpf = "CPF inválido!";
@@ -158,7 +165,9 @@ function CadastroFuncionario() {
                 id="dataNascimento"
                 value={form.dataNascimento}
                 onChange={handleChange}
+                max={new Date().toISOString().split("T")[0]} // Define o máximo para hoje
               />
+
               {erros.dataNascimento && <div className="text-danger">{erros.dataNascimento}</div>}
             </div>
 
