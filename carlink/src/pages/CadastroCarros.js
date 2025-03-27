@@ -18,7 +18,6 @@ function CadastroCarro() {
     const handleChange = (e) => {
         const { id, value } = e.target;
         setForm({ ...form, [id]: value });
-
         setErros({ ...erros, [id]: "" });
     };
 
@@ -27,39 +26,32 @@ function CadastroCarro() {
     const validarAno = (ano) => {
         const anoNum = parseInt(ano, 10);
         const anoAtual = new Date().getFullYear();
-
         return Number.isInteger(anoNum) && anoNum > 0 && anoNum <= anoAtual;
     };
-
 
     const validarFormulario = () => {
         let novosErros = {};
 
-        Object.keys(form).forEach((campo) => {
-            if (!form[campo].trim()) {
-                novosErros[campo] = "Este campo é obrigatório!";
-            }
-        });
+        if (!form.marca.trim()) novosErros.marca = "Informe a marca do veículo.";
+        if (!form.modelo.trim()) novosErros.modelo = "Informe o modelo do veículo.";
+        if (!form.ano.trim()) novosErros.ano = "Informe o ano de fabricação.";
+        else if (!validarAno(form.ano)) novosErros.ano = "Ano inválido! Insira um ano entre 1900 e o atual.";
 
-        if (form.ano && !validarAno(form.ano)) {
-            novosErros.ano = "Ano deve ser o ano atual ou anteriores!";
-        }
+        if (!form.placa.trim()) novosErros.placa = "Informe a placa do veículo.";
+        else if (!validarPlaca(form.placa)) novosErros.placa = "Formato inválido! Use AAA-1234 ou AAA1B23.";
 
-        if (form.renavam && !/^[0-9]{9,11}$/.test(form.renavam)) {
-            novosErros.renavam = "RENAVAM deve ter entre 9 e 11 dígitos!";
-        }
+        if (!form.renavam.trim()) novosErros.renavam = "Informe o RENAVAM do veículo.";
+        else if (!/^[0-9]{9,11}$/.test(form.renavam)) novosErros.renavam = "RENAVAM deve ter entre 9 e 11 dígitos numéricos.";
 
-        if (form.placa && !validarPlaca(form.placa)) {
-            novosErros.placa = "Formato inválido! Use AAA-1234 ou AAA1B23";
-        }
+        if (!form.chassi.trim()) novosErros.chassi = "Informe o número do chassi do veículo.";
 
-        if (form.cor && !validarCor(form.cor)) {
-            novosErros.cor = "Cor deve conter apenas letras!";
-        }
+        if (!form.cor.trim()) novosErros.cor = "Informe a cor do veículo.";
+        else if (!validarCor(form.cor)) novosErros.cor = "A cor deve conter apenas letras e espaços.";
 
-        if (form.potencia && isNaN(form.potencia)) {
-            novosErros.potencia = "Potência deve ser um número válido!";
-        }
+        if (!form.motor.trim()) novosErros.motor = "Informe o tipo de motor do veículo.";
+
+        if (!form.potencia.trim()) novosErros.potencia = "Informe a potência do motor.";
+        else if (isNaN(form.potencia)) novosErros.potencia = "A potência deve ser um número válido.";
 
         setErros(novosErros);
         return Object.keys(novosErros).length === 0;
@@ -94,7 +86,6 @@ function CadastroCarro() {
                                 {erros[campo] && <div className="text-danger">{erros[campo]}</div>}
                             </div>
                         ))}
-
                         <button type="submit" className="btn btn-primary">Cadastrar</button>
                     </form>
                 </div>
