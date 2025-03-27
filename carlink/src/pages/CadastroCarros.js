@@ -42,7 +42,7 @@ function CadastroCarro() {
         });
 
         if (form.ano && !validarAno(form.ano)) {
-            novosErros.ano = "Ano deve estar entre 1970 e o ano atual!";
+            novosErros.ano = "Ano deve ser o ano atual ou anteriores!";
         }
 
         if (form.renavam && !/^[0-9]{9,11}$/.test(form.renavam)) {
