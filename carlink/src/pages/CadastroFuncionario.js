@@ -30,6 +30,35 @@ function CadastroFuncionario() {
     setForm({ ...form, cpf: valor });
   };
 
+  const validarCPF = (cpf) => {
+    cpf = cpf.replace(/\D/g, ""); // Remove caracteres não numéricos
+  
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+      return false; // Verifica se tem 11 dígitos e se não é uma sequência repetida
+    }
+  
+    let soma = 0, resto;
+  
+    for (let i = 1; i <= 9; i++) {
+      soma += parseInt(cpf[i - 1]) * (11 - i);
+    }
+  
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf[9])) return false;
+  
+    soma = 0;
+    for (let i = 1; i <= 10; i++) {
+      soma += parseInt(cpf[i - 1]) * (12 - i);
+    }
+  
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf[10])) return false;
+  
+    return true;
+  };
+
   // Atualiza telefone e só aplica a máscara quando completar a digitação
   const handleTelefoneChange = (e) => {
     let valor = e.target.value.replace(/\D/g, '');
@@ -61,19 +90,34 @@ function CadastroFuncionario() {
     e.preventDefault();
     let novosErros = {};
 
-    if (!form.nome.trim()) novosErros.nome = "Por favor, preencha o nome corretamente.";
-    if (!form.cpf.match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)) novosErros.cpf = "CPF inválido! Use o formato 000.000.000-00.";
-    if (!form.telefone.match(/^\(\d{2}\)\d{4,5}-\d{4}$/)) novosErros.telefone = "Telefone inválido! Use o formato (00)00000-0000.";
-    if (!form.email.trim()) novosErros.email = "Por favor, preencha o e-mail corretamente.";
-    if (form.genero === "nao_selecionado") novosErros.genero = "Por favor, selecione um gênero.";
-    if (!form.dataNascimento) novosErros.dataNascimento = "Por favor, preencha a data de nascimento.";
+    if (!form.nome.trim() || form.nome.trim().length < 3) {
+      novosErros.nome = "O nome deve ter pelo menos 3 caracteres.";
+    }
+    if (!form.cpf.match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)) {
+      novosErros.cpf = "CPF inválido! Use o formato 000.000.000-00.";
+    }
+    if (!form.telefone.match(/^\(\d{2}\)\d{4,5}-\d{4}$/)) {
+      novosErros.telefone = "Telefone inválido! Use o formato (00)00000-0000.";
+    }
+    if (!form.email.trim()) {
+      novosErros.email = "Por favor, preencha o e-mail corretamente.";
+    }
+    if (form.genero === "nao_selecionado") {
+      novosErros.genero = "Por favor, selecione um gênero.";
+    }
+    if (!form.dataNascimento) {
+      novosErros.dataNascimento = "Por favor, preencha a data de nascimento.";
+    }
+    if (!validarCPF(form.cpf)) {
+      novosErros.cpf = "CPF inválido!";
+    }
 
     setErros(novosErros);
 
     if (Object.keys(novosErros).length === 0) {
       alert("Cadastro realizado com sucesso!");
     }
-  };
+};
 
   return (
     <div className="container mt-5">
