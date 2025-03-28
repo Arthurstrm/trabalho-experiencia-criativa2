@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // Importando o useNavigate
 
 function CadastroUsuario() {
-  const [senha, setSenha] = useState('');
-  const [repetirSenha, setRepetirSenha] = useState('');
-  const [email, setEmail] = useState('');
-  const [checkboxMarcada, setCheckboxMarcada] = useState(false);
+  // ESTADOS DO COMPONENTE
+  // Armazenam os valores atuais dos campos do formulário
+  const [senha, setSenha] = useState(''); // Armazena a senha digitada
+  const [repetirSenha, setRepetirSenha] = useState(''); // Armazena a confirmação de senha
+  const [email, setEmail] = useState(''); // Armazena o email digitado
+  const [checkboxMarcada, setCheckboxMarcada] = useState(false); // Armazena estado do checkbox
+
+  // ESTADO DE ERROS
+  // Armazena mensagens de erro para cada campo
   const [erros, setErros] = useState({
-    senha: '',
-    repetirSenha: '',
-    email: '',
+    senha: '',          // Erro da senha
+    repetirSenha: '',   // Erro da confirmação de senha
+    email: '',          // Erro do email
   });
 
+  // MENSAGENS DE ERRO PREDEFINIDAS
   const MENSAGENS_ERRO = {
     SENHA_TAMANHO: 'A senha deve ter entre 8 e 16 caracteres.',
     SENHA_COMPLEXIDADE: 'A senha deve conter pelo menos uma letra maiúscula, um número e um símbolo.',
@@ -20,11 +25,18 @@ function CadastroUsuario() {
     TERMOS_NAO_ACEITOS: 'Você deve concordar com os termos de uso para cadastrar.'
   };
 
+  // EXPRESSÕES REGULARES PARA VALIDAÇÃO
   const REGEX = {
     SENHA: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,16}$/,
     EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   };
 
+  // MÉTODOS DE VALIDAÇÃO
+
+  /**
+   * Valida se a senha atende aos requisitos
+   * Chamado em: handleSenhaChange e handleSubmit
+   */
   const validarSenha = (senha) => {
     if (senha.length < 8 || senha.length > 16) {
       return MENSAGENS_ERRO.SENHA_TAMANHO;
@@ -35,6 +47,10 @@ function CadastroUsuario() {
     return '';
   };
 
+  /**
+   * Valida se as senhas coincidem
+   * Chamado em: handleSenhaChange, handleRepetirSenhaChange e handleSubmit
+   */
   const validarRepetirSenha = (senha, repetirSenha) => {
     if (senha !== repetirSenha) {
       return MENSAGENS_ERRO.SENHA_NAO_CONFERE;
@@ -42,6 +58,10 @@ function CadastroUsuario() {
     return '';
   };
 
+  /**
+   * Valida o formato do email
+   * Chamado em: handleEmailChange e handleSubmit
+   */
   const validarEmail = (email) => {
     if (!REGEX.EMAIL.test(email)) {
       return MENSAGENS_ERRO.EMAIL_INVALIDO;
@@ -49,9 +69,16 @@ function CadastroUsuario() {
     return '';
   };
 
+  // HANDLERS (MANIPULADORES DE EVENTOS)
+
+  /**
+   * Manipula mudanças no campo de senha
+   * Chamado em: onChange do input de senha
+   */
   const handleSenhaChange = (event) => {
     const novaSenha = event.target.value;
-    setSenha(novaSenha);
+    setSenha(novaSenha); // Atualiza estado da senha
+    // Atualiza erros mantendo os existentes e validando a nova senha
     setErros({
       ...erros,
       senha: validarSenha(novaSenha),
@@ -59,66 +86,90 @@ function CadastroUsuario() {
     });
   };
 
+  /**
+   * Manipula mudanças no campo de repetir senha
+   * Chamado em: onChange do input de repetir senha
+   */
   const handleRepetirSenhaChange = (event) => {
     const novaRepetirSenha = event.target.value;
-    setRepetirSenha(novaRepetirSenha);
+    setRepetirSenha(novaRepetirSenha); // Atualiza estado da repetição
+    // Atualiza apenas o erro de repetição de senha
     setErros({
       ...erros,
       repetirSenha: validarRepetirSenha(senha, novaRepetirSenha)
     });
   };
 
+  /**
+   * Manipula mudanças no campo de email
+   * Chamado em: onChange do input de email
+   */
   const handleEmailChange = (event) => {
     const novoEmail = event.target.value;
-    setEmail(novoEmail);
+    setEmail(novoEmail); // Atualiza estado do email
+    // Atualiza apenas o erro do email
     setErros({...erros, email: validarEmail(novoEmail)});
   };
 
+  /**
+   * Manipula mudanças no checkbox de termos
+   * Chamado em: onChange do checkbox
+   */
   const handleCheckboxChange = (event) => {
-    setCheckboxMarcada(event.target.checked);
+    setCheckboxMarcada(event.target.checked); // Atualiza estado do checkbox
   };
 
+  /**
+   * Manipula o envio do formulário
+   * Chamado em: onSubmit do formulário
+   */
   const handleSubmit = (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Previne comportamento padrão do formulário
+
+    // Validações finais antes do envio
     const senhaError = validarSenha(senha);
     const repetirSenhaError = validarRepetirSenha(senha, repetirSenha);
     const emailError = validarEmail(email);
-
+    
+    // Se houver erros, atualiza o estado de erros
     if (senhaError || repetirSenhaError || emailError) {
       setErros({
         senha: senhaError,
         repetirSenha: repetirSenhaError,
         email: emailError
       });
-      return;
+      return; // Interrompe o envio
     }
 
+    // Verifica se os termos foram aceitos
     if (!checkboxMarcada) {
       alert(MENSAGENS_ERRO.TERMOS_NAO_ACEITOS);
       return;
     }
 
+    // Se tudo estiver válido, exibe mensagem de sucesso
     alert('Cadastro realizado com sucesso!');
   };
 
+  /**
+   * Verifica se existem erros nos campos
+   * @returns {boolean} True se houver erros, False caso contrário
+   * Chamado em: disabled do botão de submit
+   */
   const hasErrors = () => {
     return erros.senha || erros.repetirSenha || erros.email;
   };
 
- 
-  const navigate = useNavigate();
-
- 
-  const irParaLogin = () => {
-    navigate('/login');
-  };
-
+  // RENDERIZAÇÃO DO COMPONENTE
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6 col-lg-4">
           <h1>Cadastro Usuário</h1>
+          {/* Formulário - Chamada do handleSubmit no evento onSubmit */}
           <form onSubmit={handleSubmit}>
+            
+            {/* Campo de email */}
             <div className="mb-3">
               <label htmlFor="inputEmailCadastroUsuario" className="form-label">Email</label>
               <input
@@ -127,26 +178,34 @@ function CadastroUsuario() {
                 id="inputEmailCadastroUsuario"
                 placeholder="exemplo@email.com"
                 value={email}
-                onChange={handleEmailChange}
+                onChange={handleEmailChange} // Chamada do handler
                 required
               />
-              {erros.email && <small className="text-danger">{erros.email}</small>}
+              {/* Exibe erro se existir */}
+              {erros.email && (
+                <small className="text-danger">{erros.email}</small>
+              )}
             </div>
 
-            <div className="mb-3">
+            {/* Campo de senha */}
+            <div className="mb-3"> 
               <label htmlFor="inputPasswordCadastroUsuario" className="form-label">Senha</label>
               <input
                 type="password"
-                className={`form-control ${erros.senha ? 'is-invalid' : ''}`}
+                className={`form-control ${erros.senha ? 'is-invalid' : ''}`} // Se erros.senha existe → 'is-invalid' SENÃO → ''
                 id="inputPasswordCadastroUsuario"
                 placeholder="********"
                 value={senha}
-                onChange={handleSenhaChange}
+                onChange={handleSenhaChange} // Chamada do handler
                 required
               />
-              {erros.senha && <small className="text-danger">{erros.senha}</small>}
+              {/* Exibe erro se existir */}
+              {erros.senha && (
+                <small className="text-danger">{erros.senha}</small>
+              )}
             </div>
 
+            {/* Campo de repetir senha */}
             <div className="mb-3">
               <label htmlFor="inputRepetirPasswordCadastroUsuario" className="form-label">Repetir Senha</label>
               <input
@@ -155,12 +214,16 @@ function CadastroUsuario() {
                 id="inputRepetirPasswordCadastroUsuario"
                 placeholder="********"
                 value={repetirSenha}
-                onChange={handleRepetirSenhaChange}
+                onChange={handleRepetirSenhaChange} // Chamada do handler
                 required
               />
-              {erros.repetirSenha && <small className="text-danger">{erros.repetirSenha}</small>}
+              {/* Exibe erro se existir */}
+              {erros.repetirSenha && (
+                <small className="text-danger">{erros.repetirSenha}</small>
+              )}
             </div>
 
+            {/* Texto de ajuda */}
             <div id="passwordHelp" className="form-text mb-3">
               A senha deve ter:
               <ul className="mb-0">
@@ -171,13 +234,14 @@ function CadastroUsuario() {
               </ul>
             </div>
 
+            {/* Checkbox de termos */}
             <div className="mb-3 form-check">
               <input
                 type="checkbox"
                 className="form-check-input"
                 id="checkboxCadastroUsuario"
                 checked={checkboxMarcada}
-                onChange={handleCheckboxChange}
+                onChange={handleCheckboxChange} // Chamada do handler
                 required
               />
               <label className="form-check-label" htmlFor="checkboxCadastroUsuario">
@@ -185,24 +249,15 @@ function CadastroUsuario() {
               </label>
             </div>
 
+            {/* Botão de submit - Desabilitado se houver erros */}
             <button 
               type="submit" 
               className="btn btn-primary"
-              disabled={hasErrors()}
+              disabled={hasErrors()} // Chamada do helper
             >
               Cadastrar
             </button>
           </form>
-
-          {/* Botão para redirecionar para a tela de login */}
-          <div className="mt-3">
-            <button
-              className="btn btn-link"
-              onClick={irParaLogin}
-            >
-              Já tem uma conta? Faça login aqui.
-            </button>
-          </div>
         </div>
       </div>
     </div>

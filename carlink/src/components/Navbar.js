@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../img/logoCarlink-Escura.svg'; // Ajuste o caminho conforme necessário
+import logo from '../img/logoCarlink-Escura.svg'; 
 
 function Navbar() {
   return (
