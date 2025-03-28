@@ -3,17 +3,17 @@ import React, { useState } from 'react';
 function CadastroUsuario() {
   // ESTADOS DO COMPONENTE
   // Armazenam os valores atuais dos campos do formulário
-  const [senha, setSenha] = useState(''); // Armazena a senha digitada
-  const [repetirSenha, setRepetirSenha] = useState(''); // Armazena a confirmação de senha
-  const [email, setEmail] = useState(''); // Armazena o email digitado
-  const [checkboxMarcada, setCheckboxMarcada] = useState(false); // Armazena estado do checkbox
+  const [senha, setSenha] = useState(''); 
+  const [repetirSenha, setRepetirSenha] = useState(''); 
+  const [email, setEmail] = useState(''); 
+  const [checkboxMarcada, setCheckboxMarcada] = useState(false); 
 
   // ESTADO DE ERROS
   // Armazena mensagens de erro para cada campo
   const [erros, setErros] = useState({
-    senha: '',          // Erro da senha
-    repetirSenha: '',   // Erro da confirmação de senha
-    email: '',          // Erro do email
+    senha: '',          
+    repetirSenha: '',   
+    email: '',         
   });
 
   // MENSAGENS DE ERRO PREDEFINIDAS
@@ -153,7 +153,6 @@ function CadastroUsuario() {
 
   /**
    * Verifica se existem erros nos campos
-   * @returns {boolean} True se houver erros, False caso contrário
    * Chamado em: disabled do botão de submit
    */
   const hasErrors = () => {
@@ -174,7 +173,7 @@ function CadastroUsuario() {
               <label htmlFor="inputEmailCadastroUsuario" className="form-label">Email</label>
               <input
                 type="email"
-                className={`form-control ${erros.email ? 'is-invalid' : ''}`}
+                className={`form-control ${erros.email ? 'is-invalid' : ''}`} // Se houver algo em erros 'is invalid' SENÃO 'vazio' e permite o uso do botão
                 id="inputEmailCadastroUsuario"
                 placeholder="exemplo@email.com"
                 value={email}
