@@ -12,6 +12,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function App() {
   return (
+    <div className='container'>
     <Router>
       <Navbar />
       <Routes>
@@ -21,6 +22,7 @@ function App() {
         <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
+    </div>
   );
 }
 
