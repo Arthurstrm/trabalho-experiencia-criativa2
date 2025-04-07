@@ -7,7 +7,7 @@ function Navbar() {
     <nav className="navbar navbar-expand-lg navbar-light bg-white">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
-          <img src={logo} alt="Logo"  height="50" className="d-inline-block align-text-top" />
+          <img src={logo} alt="Logo"  height="80" className="d-inline-block align-text-top" />
         </Link>
         <button
           className="navbar-toggler"

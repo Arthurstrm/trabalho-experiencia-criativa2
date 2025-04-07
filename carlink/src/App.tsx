@@ -5,6 +5,10 @@ import CadastroUsuario from './pages/CadastroUsuario';
 import CadastroCarros from './pages/CadastroCarros';
 import CadastroFuncionario from './pages/CadastroFuncionario';
 import Login from './pages/Login';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import './custom.scss';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function App() {
   return (
