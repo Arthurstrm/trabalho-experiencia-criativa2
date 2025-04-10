@@ -6,7 +6,7 @@ function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
+        <Link className="navbar-brand" to="/home">
           <img src={logo} alt="Logo"  height="80" className="d-inline-block align-text-top" />
         </Link>
         <button
@@ -23,9 +23,6 @@ function Navbar() {
         <div className="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link className="nav-link" to="/cadastro-login">
-                Cadastro de Login
-              </Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/cadastro-carros">
@@ -40,9 +37,14 @@ function Navbar() {
           </ul>
         </div>
         {/* Ícone de login no canto direito */}
-        <Link className="nav-link ms-auto" to="/login">
-          <span className="material-icons">login</span>
-        </Link>
+        <div className="d-flex">
+          <Link className="btn btn-outline-primary me-2" to="/cadastro-login">
+            Cadastrar
+          </Link>
+          <Link className="btn btn-primary" to="/login">
+            Entrar
+          </Link>
+        </div>
       </div>
     </nav>
   );

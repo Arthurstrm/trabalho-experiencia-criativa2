@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './custom.scss';
 import CadastroLogin from './pages/CadastroLogin';
+import Index from './pages/Index';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
+        <Route path="/home" element={<Index />} />
         <Route path="/cadastro-login" element={<CadastroLogin />} />
         <Route path="/cadastro-carros" element={<CadastroCarros />} />
         <Route path="/cadastro-funcionario" element={<CadastroFuncionario />} />
