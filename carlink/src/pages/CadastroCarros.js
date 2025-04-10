@@ -1,28 +1,43 @@
 import React, { useState } from 'react';
-import fundoCadastro from './assets/pexels-sarmad-mughal-94606-305070.jpg'; // ajuste o caminho se necessário
 
 function CadastroCarro() {
     const [form, setForm] = useState({
         marca: "", modelo: "", ano: "", placa: "",
-        renavam: "", chassi: "", cor: "", motor: "", potencia: ""
+        renavam: "", chassi: "", cor: "", motor: "", potencia: "", preco: ""
     });
+
     const [erros, setErros] = useState({});
 
     const handleChange = (e) => {
         const { id, value } = e.target;
 
         if (id === "placa" && value.length > 7) return;
-        if (id === "renavam") {
-            // Permitir apenas números e limitar a 11 dígitos
-            if (!/^\d*$/.test(value) || value.length > 11) return;
+        if (id === "renavam" && value.length > 11) return;
+
+        // Máscara para o campo de preço
+        if (id === "preco") {
+            const numero = value.replace(/\D/g, '');
+            const formatado = (Number(numero) / 100).toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+            setForm({ ...form, preco: formatado });
+            setErros({ ...erros, preco: "" });
+            return;
         }
 
-        setForm({ ...form, [id]: id === "placa" ? value.toUpperCase() : value });
+        setForm({
+            ...form,
+            [id]: id === "placa" ? value.toUpperCase() : value
+        });
         setErros({ ...erros, [id]: "" });
     };
 
-    const validarPlaca = (placa) => /^[A-Z]{3}-?\d{4}$|^[A-Z]{3}\d{1}[A-Z]{1}\d{2}$/.test(placa);
+    const validarPlaca = (placa) =>
+        /^[A-Z]{3}-?\d{4}$|^[A-Z]{3}\d{1}[A-Z]{1}\d{2}$/.test(placa);
+
     const validarCor = (cor) => /^[A-Za-zÀ-ÿ\s]+$/.test(cor);
+
     const validarAno = (ano) => {
         const anoNum = parseInt(ano, 10);
         const anoAtual = new Date().getFullYear();
@@ -41,19 +56,15 @@ function CadastroCarro() {
         if (form.ano && !validarAno(form.ano)) {
             novosErros.ano = "Ano deve ser o ano atual ou anteriores!";
         }
-
-        if (form.renavam && !/^\d{9,11}$/.test(form.renavam)) {
-            novosErros.renavam = "RENAVAM deve ter entre 9 e 11 dígitos numéricos!";
+        if (form.renavam && !/^[0-9]{9,11}$/.test(form.renavam)) {
+            novosErros.renavam = "RENAVAM deve ter entre 9 e 11 dígitos!";
         }
-
         if (form.placa && !validarPlaca(form.placa)) {
             novosErros.placa = "Formato inválido! Use AAA-1234 ou AAA1B23";
         }
-
         if (form.cor && !validarCor(form.cor)) {
             novosErros.cor = "Cor deve conter apenas letras!";
         }
-
         if (form.potencia && isNaN(form.potencia)) {
             novosErros.potencia = "Potência deve ser um número válido!";
         }
@@ -69,69 +80,59 @@ function CadastroCarro() {
         }
     };
 
-    return (
-        <div
-            style={{
-                backgroundImage: `url(${fundoCadastro})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundAttachment: 'fixed',
-                minHeight: '100vh',
-                overflow: 'auto',
-                position: 'relative'
-            }}
-        >
-            {/* Camada escura por cima do fundo */}
-            <div style={{
-                position: 'absolute',
-                top: 0, left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                zIndex: 0
-            }} />
+    const renderInput = (campo, col = "col-md-6", label = null, type = null) => (
+        <div className={col} key={campo}>
+            <label htmlFor={campo} className="form-label">
+                {label || campo.charAt(0).toUpperCase() + campo.slice(1)}
+            </label>
+            <input
+                type={type || (campo === "ano" || campo === "potencia" ? "number" : "text")}
+                className={`form-control py-2 ${erros[campo] ? 'is-invalid' : ''}`}
+                id={campo}
+                value={form[campo]}
+                onChange={handleChange}
+                placeholder={campo === "preco" ? "R$ 0,00" : `Digite ${label?.toLowerCase() || campo}`}
+                maxLength={campo === "renavam" ? 11 : campo === "placa" ? 7 : undefined}
+            />
+            {erros[campo] && <div className="text-danger">{erros[campo]}</div>}
+        </div>
+    );
 
-            {/* Conteúdo do formulário */}
-            <div style={{
-                position: 'relative',
-                zIndex: 1,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '100vh',
-                padding: '20px'
-            }}>
-                <div style={{
-                    backgroundColor: 'rgba(255,255,255,0.9)',
-                    padding: '30px',
-                    borderRadius: '10px',
-                    maxWidth: '500px',
-                    width: '100%',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                }}>
-                    <h1 className="text-center mb-4">Cadastro de Carro</h1>
-                    <form onSubmit={handleSubmit}>
-                        {Object.keys(form).map((campo) => (
-                            <div className="mb-3" key={campo}>
-                                <label htmlFor={campo} className="form-label">
-                                    {campo.charAt(0).toUpperCase() + campo.slice(1)}
-                                </label>
-                                <input
-                                    type={(campo === "ano" || campo === "potencia" || campo === "renavam") ? "number" : "text"}
-                                    className={`form-control ${erros[campo] ? 'is-invalid' : ''}`}
-                                    id={campo}
-                                    value={form[campo]}
-                                    onChange={handleChange}
-                                    placeholder={`Digite ${campo}`}
-                                    maxLength={campo === "renavam" ? 11 : campo === "placa" ? 7 : undefined}
-                                />
-                                {erros[campo] && <div className="text-danger">{erros[campo]}</div>}
-                            </div>
-                        ))}
-                        <button type="submit" className="btn btn-primary w-100">Cadastrar</button>
-                    </form>
+    return (
+        <div className="container mt-4" style={{ maxWidth: '700px' }}>
+            <h1 className="mb-4">Cadastro de Carro</h1>
+            <form onSubmit={handleSubmit}>
+                <div className="row g-3">
+                    {renderInput("marca", "col-md-6")}
+                    {renderInput("modelo", "col-md-6")}
                 </div>
-            </div>
+
+                <div className="row g-3">
+                    {renderInput("ano", "col-md-4")}
+                    {renderInput("placa", "col-md-4")}
+                    {renderInput("cor", "col-md-4")}
+                </div>
+
+                <div className="row g-3">
+                    {renderInput("renavam", "col-md-6")}
+                    {renderInput("chassi", "col-md-6")}
+                </div>
+
+                <div className="row g-3">
+                    {renderInput("motor", "col-md-6")}
+                    {renderInput("potencia", "col-md-6")}
+                </div>
+
+                <div className="row g-3">
+                    {renderInput("preco", "col-md-6", "Preço pretendido")}
+                </div>
+
+                <div className="mt-4">
+                    <button type="submit" className="btn btn-primary px-5 py-2">
+                        Cadastrar
+                    </button>
+                </div>
+            </form>
         </div>
     );
 }
