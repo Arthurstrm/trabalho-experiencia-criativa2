@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import fundoCadastro from '../img/pexels-sarmad-mughal-94606-305070.jpg';
+import fundoCadastro from './assets/pexels-sarmad-mughal-94606-305070.jpg'; // ajuste o caminho se necessário
 
 function CadastroCarro() {
     const [form, setForm] = useState({
@@ -10,8 +10,12 @@ function CadastroCarro() {
 
     const handleChange = (e) => {
         const { id, value } = e.target;
+
         if (id === "placa" && value.length > 7) return;
-        if (id === "renavam" && value.length > 11) return;
+        if (id === "renavam") {
+            // Permitir apenas números e limitar a 11 dígitos
+            if (!/^\d*$/.test(value) || value.length > 11) return;
+        }
 
         setForm({ ...form, [id]: id === "placa" ? value.toUpperCase() : value });
         setErros({ ...erros, [id]: "" });
@@ -27,26 +31,33 @@ function CadastroCarro() {
 
     const validarFormulario = () => {
         let novosErros = {};
+
         Object.keys(form).forEach((campo) => {
             if (!form[campo].trim()) {
                 novosErros[campo] = "Este campo é obrigatório!";
             }
         });
+
         if (form.ano && !validarAno(form.ano)) {
             novosErros.ano = "Ano deve ser o ano atual ou anteriores!";
         }
-        if (form.renavam && !/^[0-9]{9,11}$/.test(form.renavam)) {
-            novosErros.renavam = "RENAVAM deve ter entre 9 e 11 dígitos!";
+
+        if (form.renavam && !/^\d{9,11}$/.test(form.renavam)) {
+            novosErros.renavam = "RENAVAM deve ter entre 9 e 11 dígitos numéricos!";
         }
+
         if (form.placa && !validarPlaca(form.placa)) {
             novosErros.placa = "Formato inválido! Use AAA-1234 ou AAA1B23";
         }
+
         if (form.cor && !validarCor(form.cor)) {
             novosErros.cor = "Cor deve conter apenas letras!";
         }
+
         if (form.potencia && isNaN(form.potencia)) {
             novosErros.potencia = "Potência deve ser um número válido!";
         }
+
         setErros(novosErros);
         return Object.keys(novosErros).length === 0;
     };
@@ -106,7 +117,7 @@ function CadastroCarro() {
                                     {campo.charAt(0).toUpperCase() + campo.slice(1)}
                                 </label>
                                 <input
-                                    type={campo === "ano" || campo === "potencia" ? "number" : "text"}
+                                    type={(campo === "ano" || campo === "potencia" || campo === "renavam") ? "number" : "text"}
                                     className={`form-control ${erros[campo] ? 'is-invalid' : ''}`}
                                     id={campo}
                                     value={form[campo]}
