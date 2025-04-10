@@ -23,8 +23,8 @@ function Navbar() {
         <div className="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link className="nav-link" to="/cadastro-usuario">
-                Cadastro de Usuário
+              <Link className="nav-link" to="/cadastro-login">
+                Cadastro de Login
               </Link>
             </li>
             <li className="nav-item">
