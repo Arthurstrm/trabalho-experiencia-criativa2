@@ -1,2 +1,6 @@
 $primary: #303030;
+$secondary: #ececec;
 @import '~bootstrap/scss/bootstrap';
+body {
+    background-color: #ececec;
+}

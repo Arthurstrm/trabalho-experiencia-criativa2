@@ -1,0 +1,26 @@
+[
+    {
+      "imageUrl": "https://www.webmotors.com.br/imagens/prod/379411/RAM_RAMPAGE_2.0_HURRICANE_4_TURBO_GASOLINA_REBEL_4X4_AUTOMATICO_37941117054203912.webp?s=fill&w=170&h=125&t=true",
+      "title": "RAM RAMPAGE",
+      "subtitle": "2.2 Turbo Diesel Rebel 4x4 Automático",
+      "yearMileage": "2025/2025 0 Km",
+      "price": "270.990",
+      "link": "/oferta-1"
+    },
+    {
+      "imageUrl": "https://www.citroen.com.br/content/dam/citroen/paginas/showrooms/novo-c3/versoes/c3-you.webp",
+      "title": "CITROËN C3 AIRCROSS",
+      "subtitle": "1.0 Turbo 200 Flex Feel 7l Cvt",
+      "yearMileage": "2025/2025 0 Km",
+      "price": "121.100",
+      "link": "/oferta-2"
+    },
+    {
+      "imageUrl": "https://www.webmotors.com.br/imagens/prod/342259/FIAT_500_1.4_ABARTH_16V_TURBO_GASOLINA_2P_MANUAL_34225910192571966.webp",
+      "title": "FIAT 500",
+      "subtitle": "1.0 8V Flex Cult 3p Aut.",
+      "yearMileage": "2024/2024 10.000 Km",
+      "price": "85.500",
+      "link": "/oferta-3"
+    }
+  ]

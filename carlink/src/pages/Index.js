@@ -1,38 +1,61 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import CarroselIndex1 from '../img/CarroselIndex1.webp';
-import CarroselIndex2 from '../img/CarroselIndex2.webp';
-import CarroselIndex3 from '../img/CarroselIndex3.webp'; 
+import index_banner from '../img/index_banner.webp';
+import carData from '../data/caraData.json';
+
+const CarListing = ({ imageUrl, title, subtitle, yearMileage, price, link }) => {
+    return (
+      <div className="col-md-6 col-lg-4 mb-4">
+        <div className="card h-100">
+          <div className="position-relative" style={{ height: '200px', overflow: 'hidden' }}>
+            <img
+              src={imageUrl}
+              className="card-img-top"
+              alt={title}
+              style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+            />
+          </div>
+          <div className="card-body">
+            <h5 className="card-title fw-bold">{title}</h5>
+            <p className="card-text small">{subtitle}</p>
+            <p className="card-text small">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-calendar me-1" viewBox="0 0 16 16">
+                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0v1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+              </svg>
+              {yearMileage}
+            </p>
+            <p className="card-text fw-bold">R$ {price}</p>
+            <a href={link} className="btn btn-primary w-100">Ver oferta</a>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
 
 const Index = () => {
-    return (
-        <div id="carouselExampleIndicators" className="carousel slide" data-bs-ride="carousel">
-            <div className="carousel-indicators">
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" className="active" aria-current="true" aria-label="Slide 1"></button>
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-            </div>
-            <div className="carousel-inner">
-                <div className="carousel-item active">
-                    <img src= {CarroselIndex1} className="d-block w-100" alt="First slide" />
-                </div>
-                <div className="carousel-item">
-                    <img src={CarroselIndex2} className="d-block w-100" alt="Second slide" />
-                </div>
-                <div className="carousel-item">
-                    <img src={CarroselIndex3} className="d-block w-100" alt="Third slide" />
-                </div>
-            </div>
-            <button className="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span className="visually-hidden">Previous</span>
-            </button>
-            <button className="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                <span className="visually-hidden">Next</span>
-            </button>
+  return (
+    <div className="container">
+      <a href='/'>
+        <div>
+          <img src={index_banner} alt="Index Banner" className="img-fluid mb-4 rounded" />
         </div>
-    );
+      </a>
+      <div className="row">
+        {carData.map((car, index) => (
+          <CarListing
+            key={index}
+            imageUrl={car.imageUrl}
+            title={car.title}
+            subtitle={car.subtitle}
+            yearMileage={car.yearMileage}
+            price={car.price}
+            link={car.link}
+          />
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Index;

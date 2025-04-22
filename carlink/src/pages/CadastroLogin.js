@@ -243,7 +243,7 @@ function CadastroLogin() {
                 required
               />
               <label className="form-check-label" htmlFor="checkboxCadastroLogin">
-                Concordo com os <a href="#">Termos de uso.</a>
+                Concordo com os <a href="/">Termos de uso.</a>
               </label>
             </div>
 
