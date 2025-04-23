@@ -12,16 +12,12 @@ function CadastroFuncionario() {
 
   const [erros, setErros] = useState({});
 
-  // Atualiza os valores do formulário
   const handleChange = (e) => {
     const { id, value } = e.target;
     setForm({ ...form, [id]: value });
-
-    // Remove erro ao digitar novamente
     setErros({ ...erros, [id]: "" });
   };
 
-  // Máscara para CPF
   const mascaraCPF = (e) => {
     let valor = e.target.value.replace(/\D/g, '');
     if (valor.length <= 11) {
@@ -31,62 +27,40 @@ function CadastroFuncionario() {
   };
 
   const validarCPF = (cpf) => {
-    cpf = cpf.replace(/\D/g, ""); // Remove caracteres não numéricos
-
-    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
-      return false; // Verifica se tem 11 dígitos e se não é uma sequência repetida
-    }
-
+    cpf = cpf.replace(/\D/g, "");
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
     let soma = 0, resto;
-
-    for (let i = 1; i <= 9; i++) {
-      soma += parseInt(cpf[i - 1]) * (11 - i);
-    }
-
+    for (let i = 1; i <= 9; i++) soma += parseInt(cpf[i - 1]) * (11 - i);
     resto = (soma * 10) % 11;
     if (resto === 10 || resto === 11) resto = 0;
     if (resto !== parseInt(cpf[9])) return false;
-
     soma = 0;
-    for (let i = 1; i <= 10; i++) {
-      soma += parseInt(cpf[i - 1]) * (12 - i);
-    }
-
+    for (let i = 1; i <= 10; i++) soma += parseInt(cpf[i - 1]) * (12 - i);
     resto = (soma * 10) % 11;
     if (resto === 10 || resto === 11) resto = 0;
     if (resto !== parseInt(cpf[10])) return false;
-
     return true;
   };
 
-  // Atualiza telefone e só aplica a máscara quando completar a digitação
   const handleTelefoneChange = (e) => {
     let valor = e.target.value.replace(/\D/g, '');
-    if (valor.length > 11) {
-      valor = valor.slice(0, 11);
-    }
+    if (valor.length > 11) valor = valor.slice(0, 11);
     setForm({ ...form, telefone: valor });
   };
 
-  // Aplica a máscara ao telefone quando o usuário terminar de digitar
   const formatarTelefone = () => {
     let valor = form.telefone;
-    if (valor.length === 10) {
-      valor = `(${valor.slice(0, 2)})${valor.slice(2, 6)}-${valor.slice(6)}`;
-    } else if (valor.length === 11) {
-      valor = `(${valor.slice(0, 2)})${valor.slice(2, 7)}-${valor.slice(7)}`;
-    }
+    if (valor.length === 10) valor = `(${valor.slice(0, 2)})${valor.slice(2, 6)}-${valor.slice(6)}`;
+    else if (valor.length === 11) valor = `(${valor.slice(0, 2)})${valor.slice(2, 7)}-${valor.slice(7)}`;
     setForm({ ...form, telefone: valor });
   };
 
-  // Impede números e caracteres especiais no nome (permite apenas letras e espaços)
   const handleNomeChange = (e) => {
     let valor = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
     setForm({ ...form, nome: valor });
   };
 
-  // Validação antes do envio
-  const validarFormulario = (e) => {
+  const validarFormulario = async (e) => { // Tornar a função assíncrona
     e.preventDefault();
     let novosErros = {};
 
@@ -110,7 +84,6 @@ function CadastroFuncionario() {
     } else {
       const dataNascimento = new Date(form.dataNascimento);
       const hoje = new Date();
-      
       if (dataNascimento > hoje) {
         novosErros.dataNascimento = "A data de nascimento inválida.";
       }
@@ -122,7 +95,35 @@ function CadastroFuncionario() {
     setErros(novosErros);
 
     if (Object.keys(novosErros).length === 0) {
-      alert("Cadastro realizado com sucesso!");
+      try {
+        const response = await fetch('/api/cadastrar_funcionario', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(form),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("Funcionário cadastrado com sucesso!");
+          // Limpar o formulário após o sucesso
+          setForm({
+            nome: "",
+            genero: "nao_selecionado",
+            dataNascimento: "",
+            cpf: "",
+            email: "",
+            telefone: ""
+          });
+        } else {
+          alert(`Erro ao cadastrar: ${data.error || 'Erro desconhecido'}`);
+        }
+      } catch (error) {
+        console.error("Erro ao enviar dados:", error);
+        alert("Erro ao comunicar com o servidor.");
+      }
     }
   };
 
@@ -165,9 +166,8 @@ function CadastroFuncionario() {
                 id="dataNascimento"
                 value={form.dataNascimento}
                 onChange={handleChange}
-                max={new Date().toISOString().split("T")[0]} // Define o máximo para hoje
+                max={new Date().toISOString().split("T")[0]}
               />
-
               {erros.dataNascimento && <div className="text-danger">{erros.dataNascimento}</div>}
             </div>
 
