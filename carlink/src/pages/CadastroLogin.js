@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-function CadastroLogin() {
+
+function CadastroLogin({ onCadastroSucesso }) {
   // ESTADOS DO COMPONENTE
   // Armazenam os valores atuais dos campos do formulário
-  const [senha, setSenha] = useState(''); 
-  const [repetirSenha, setRepetirSenha] = useState(''); 
-  const [email, setEmail] = useState(''); 
-  const [checkboxMarcada, setCheckboxMarcada] = useState(false); 
+  const [senha, setSenha] = useState('');
+  const [repetirSenha, setRepetirSenha] = useState('');
+  const [email, setEmail] = useState('');
+  const [checkboxMarcada, setCheckboxMarcada] = useState(false);
 
   // ESTADO DE ERROS
   // Armazena mensagens de erro para cada campo
   const [erros, setErros] = useState({
-    senha: '',          
-    repetirSenha: '',   
-    email: '',         
+    senha: '',
+    repetirSenha: '',
+    email: '',
+    termos: '', // Adicionado erro para termos
+    cadastro: '', // Adicionado erro geral de cadastro
   });
 
   // MENSAGENS DE ERRO PREDEFINIDAS
@@ -21,13 +24,15 @@ function CadastroLogin() {
     SENHA_COMPLEXIDADE: 'A senha deve conter pelo menos uma letra maiúscula, um número e um símbolo.',
     SENHA_NAO_CONFERE: 'As senhas não coincidem.',
     EMAIL_INVALIDO: 'Por favor, insira um email válido.',
-    TERMOS_NAO_ACEITOS: 'Você deve concordar com os termos de uso para cadastrar.'
+    EMAIL_EXISTENTE: 'Este email já está cadastrado.',
+    TERMOS_NAO_ACEITOS: 'Você deve concordar com os termos de uso para cadastrar.',
+    CADASTRO_FALHOU: 'Erro ao realizar o cadastro. Tente novamente.',
   };
 
   // EXPRESSÕES REGULARES PARA VALIDAÇÃO
   const REGEX = {
     SENHA: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,16}$/,
-    EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   };
 
   // MÉTODOS DE VALIDAÇÃO
@@ -81,7 +86,7 @@ function CadastroLogin() {
     setErros({
       ...erros,
       senha: validarSenha(novaSenha),
-      repetirSenha: validarRepetirSenha(novaSenha, repetirSenha)
+      repetirSenha: validarRepetirSenha(novaSenha, repetirSenha),
     });
   };
 
@@ -95,7 +100,7 @@ function CadastroLogin() {
     // Atualiza apenas o erro de repetição de senha
     setErros({
       ...erros,
-      repetirSenha: validarRepetirSenha(senha, novaRepetirSenha)
+      repetirSenha: validarRepetirSenha(senha, novaRepetirSenha),
     });
   };
 
@@ -107,7 +112,7 @@ function CadastroLogin() {
     const novoEmail = event.target.value;
     setEmail(novoEmail); // Atualiza estado do email
     // Atualiza apenas o erro do email
-    setErros({...erros, email: validarEmail(novoEmail)});
+    setErros({ ...erros, email: validarEmail(novoEmail) });
   };
 
   /**
@@ -116,38 +121,63 @@ function CadastroLogin() {
    */
   const handleCheckboxChange = (event) => {
     setCheckboxMarcada(event.target.checked); // Atualiza estado do checkbox
+    setErros({ ...erros, termos: event.target.checked ? '' : MENSAGENS_ERRO.TERMOS_NAO_ACEITOS });
   };
 
   /**
    * Manipula o envio do formulário
    * Chamado em: onSubmit do formulário
    */
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault(); // Previne comportamento padrão do formulário
 
     // Validações finais antes do envio
     const senhaError = validarSenha(senha);
     const repetirSenhaError = validarRepetirSenha(senha, repetirSenha);
     const emailError = validarEmail(email);
-    
+    const termosError = checkboxMarcada ? '' : MENSAGENS_ERRO.TERMOS_NAO_ACEITOS;
+
     // Se houver erros, atualiza o estado de erros
-    if (senhaError || repetirSenhaError || emailError) {
+    if (senhaError || repetirSenhaError || emailError || termosError) {
       setErros({
         senha: senhaError,
         repetirSenha: repetirSenhaError,
-        email: emailError
+        email: emailError,
+        termos: termosError,
       });
       return; // Interrompe o envio
     }
 
-    // Verifica se os termos foram aceitos
-    if (!checkboxMarcada) {
-      alert(MENSAGENS_ERRO.TERMOS_NAO_ACEITOS);
-      return;
-    }
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/cadastrar_login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, senha }),
+      });
 
-    // Se tudo estiver válido, exibe mensagem de sucesso
-    alert('Cadastro realizado com sucesso!');
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Cadastro de login realizado com sucesso!');
+        if (onCadastroSucesso) {
+          onCadastroSucesso(data.login_id); // Envia o login_id para o componente pai, se fornecido
+        }
+        // Limpar os campos após o sucesso
+        setEmail('');
+        setSenha('');
+        setRepetirSenha('');
+        setCheckboxMarcada(false);
+        setErros({ senha: '', repetirSenha: '', email: '', termos: '', cadastro: '' });
+      } else {
+        console.error('Erro no cadastro de login:', data);
+        setErros({ ...erros, cadastro: data.error || MENSAGENS_ERRO.CADASTRO_FALHOU });
+      }
+    } catch (error) {
+      console.error('Erro ao comunicar com o servidor:', error);
+      setErros({ ...erros, cadastro: MENSAGENS_ERRO.CADASTRO_FALHOU });
+    }
   };
 
   /**
@@ -155,7 +185,7 @@ function CadastroLogin() {
    * Chamado em: disabled do botão de submit
    */
   const hasErrors = () => {
-    return erros.senha || erros.repetirSenha || erros.email;
+    return erros.senha || erros.repetirSenha || erros.email || erros.termos;
   };
 
   // RENDERIZAÇÃO DO COMPONENTE
@@ -164,9 +194,9 @@ function CadastroLogin() {
       <div className="row justify-content-center">
         <div className="col-md-6 col-lg-4">
           <h1>Cadastro de Login</h1>
+          {erros.cadastro && <div className="alert alert-danger">{erros.cadastro}</div>}
           {/* Formulário - Chamada do handleSubmit no evento onSubmit */}
           <form onSubmit={handleSubmit}>
-            
             {/* Campo de email */}
             <div className="mb-3">
               <label htmlFor="inputEmailCadastroLogin" className="form-label">Email</label>
@@ -186,7 +216,7 @@ function CadastroLogin() {
             </div>
 
             {/* Campo de senha */}
-            <div className="mb-3"> 
+            <div className="mb-3">
               <label htmlFor="inputPasswordCadastroLogin" className="form-label">Senha</label>
               <input
                 type="password"
@@ -245,13 +275,14 @@ function CadastroLogin() {
               <label className="form-check-label" htmlFor="checkboxCadastroLogin">
                 Concordo com os <a href="/">Termos de uso.</a>
               </label>
+              {erros.termos && <small className="text-danger">{erros.termos}</small>}
             </div>
 
-            {/* Botão de submit - Desabilitado se houver erros */}
-            <button 
-              type="submit" 
+            {/* Botão de submit - Desabilitado se houver erros OU termos não aceitos */}
+            <button
+              type="submit"
               className="btn btn-primary"
-              disabled={hasErrors()} // Chamada do helper
+              disabled={hasErrors() || !checkboxMarcada} // Chamada do helper
             >
               Cadastrar
             </button>

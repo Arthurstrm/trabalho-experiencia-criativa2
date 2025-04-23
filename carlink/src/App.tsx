@@ -23,7 +23,13 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/cadastro-login" element={<CadastroLogin />} />
+        <Route
+          path="/cadastro-login"
+          element={<CadastroLogin onCadastroSucesso={(idDoLogin: number) => {
+            console.log('ID:', idDoLogin);
+            // Sua lógica de navegação aqui
+          }} />}
+        />
         <Route path="/cadastro-carros" element={<CadastroCarros />} />
         <Route path="/cadastro-funcionario" element={<CadastroFuncionario />} />
         <Route path="/login" element={<Login />} />
