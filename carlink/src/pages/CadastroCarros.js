@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+const botaoCor = '#1a1a1a'; // Cor mais escura
 
 function CadastroCarro() {
     const [form, setForm] = useState({
@@ -6,6 +10,32 @@ function CadastroCarro() {
         renavam: "", chassi: "", cor: "", motor: "", potencia: "", preco: ""
     });
     const [erros, setErros] = useState({});
+
+    const erroAlerta = (mensagem) => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: mensagem,
+            confirmButtonColor: botaoCor,
+            confirmButtonText: 'Fechar',
+            customClass: {
+                confirmButton: 'custom-button'
+            }
+        });
+    };
+
+    const sucessoAlerta = (mensagem) => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Sucesso!',
+            text: mensagem,
+            confirmButtonColor: botaoCor,
+            confirmButtonText: 'Fechar',
+            customClass: {
+                confirmButton: 'custom-button'
+            }
+        });
+    };
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -76,8 +106,13 @@ function CadastroCarro() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
         if (validarFormulario()) {
-            alert("Cadastro realizado com sucesso!");
+            sucessoAlerta("Carro cadastrado com sucesso!");
+            // Limpar formulário se quiser:
+            // setForm({ marca: "", modelo: "", ano: "", placa: "", renavam: "", chassi: "", cor: "", motor: "", potencia: "", preco: "" });
+        } else {
+            erroAlerta("Preencha todos os campos corretamente.");
         }
     };
 
