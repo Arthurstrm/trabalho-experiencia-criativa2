@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import ListaUsuarios from './ListaUsuarios'; // Você pode importar ListaUsuarios aqui se precisar exibir a lista nesta página
 
 function CadastroUsuario() {
   const [form, setForm] = useState({
@@ -12,15 +11,17 @@ function CadastroUsuario() {
   });
 
   const [erros, setErros] = useState({});
-  const [mensagemSucesso, setMensagemSucesso] = useState('');
-  const [mensagemErroGeral, setMensagemErroGeral] = useState('');
 
+  // Atualiza os valores do formulário
   const handleChange = (e) => {
     const { id, value } = e.target;
     setForm({ ...form, [id]: value });
+
+    // Remove erro ao digitar novamente
     setErros({ ...erros, [id]: "" });
   };
 
+  // Máscara para CPF
   const mascaraCPF = (e) => {
     let valor = e.target.value.replace(/\D/g, '');
     if (valor.length <= 11) {
@@ -30,42 +31,62 @@ function CadastroUsuario() {
   };
 
   const validarCPF = (cpf) => {
-    cpf = cpf.replace(/\D/g, "");
+    cpf = cpf.replace(/\D/g, ""); // Remove caracteres não numéricos
+
     if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
-      return false;
+      return false; // Verifica se tem 11 dígitos e se não é uma sequência repetida
     }
+
     let soma = 0, resto;
-    for (let i = 1; i <= 9; i++) soma += parseInt(cpf[i - 1]) * (11 - i);
+
+    for (let i = 1; i <= 9; i++) {
+      soma += parseInt(cpf[i - 1]) * (11 - i);
+    }
+
     resto = (soma * 10) % 11;
     if (resto === 10 || resto === 11) resto = 0;
     if (resto !== parseInt(cpf[9])) return false;
+
     soma = 0;
-    for (let i = 1; i <= 10; i++) soma += parseInt(cpf[i - 1]) * (12 - i);
+    for (let i = 1; i <= 10; i++) {
+      soma += parseInt(cpf[i - 1]) * (12 - i);
+    }
+
     resto = (soma * 10) % 11;
     if (resto === 10 || resto === 11) resto = 0;
     if (resto !== parseInt(cpf[10])) return false;
+
     return true;
   };
 
+  // Atualiza telefone e só aplica a máscara quando completar a digitação
   const handleTelefoneChange = (e) => {
     let valor = e.target.value.replace(/\D/g, '');
-    if (valor.length > 11) valor = valor.slice(0, 11);
+    if (valor.length > 11) {
+      valor = valor.slice(0, 11);
+    }
     setForm({ ...form, telefone: valor });
   };
 
+  // Aplica a máscara ao telefone quando o usuário terminar de digitar
   const formatarTelefone = () => {
     let valor = form.telefone;
-    if (valor.length === 10) valor = `(${valor.slice(0, 2)})${valor.slice(2, 6)}-${valor.slice(6)}`;
-    else if (valor.length === 11) valor = `(${valor.slice(0, 2)})${valor.slice(2, 7)}-${valor.slice(7)}`;
+    if (valor.length === 10) {
+      valor = `(${valor.slice(0, 2)})${valor.slice(2, 6)}-${valor.slice(6)}`;
+    } else if (valor.length === 11) {
+      valor = `(${valor.slice(0, 2)})${valor.slice(2, 7)}-${valor.slice(7)}`;
+    }
     setForm({ ...form, telefone: valor });
   };
 
-  const handleNomeChange = (e) => {
-    let valor = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
-    setForm({ ...form, nome: valor });
-  };
+  // Impede números e caracteres especiais no nome (permite apenas letras e espaços)
+    const handleNomeChange = (e) => {
+        let valor = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+        setForm({ ...form, nome: valor });
+    };
 
-  const handleSubmit = async (e) => {
+  // Validação antes do envio
+  const validarFormulario = (e) => {
     e.preventDefault();
     let novosErros = {};
 
@@ -81,11 +102,12 @@ function CadastroUsuario() {
     if (!form.email.trim()) {
       novosErros.email = "Por favor, preencha o e-mail corretamente.";
     }
-    if (!form.dataNascimento) {
+     if (!form.dataNascimento) {
       novosErros.dataNascimento = "Por favor, preencha a data de nascimento.";
     } else {
       const dataNascimento = new Date(form.dataNascimento);
       const hoje = new Date();
+      
       if (dataNascimento > hoje) {
         novosErros.dataNascimento = "A data de nascimento inválida.";
       }
@@ -97,35 +119,7 @@ function CadastroUsuario() {
     setErros(novosErros);
 
     if (Object.keys(novosErros).length === 0) {
-      try {
-        const response = await fetch('http://127.0.0.1:5000/api/cadastrar_usuario', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(form),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setMensagemSucesso('Usuário cadastrado com sucesso!');
-          setMensagemErroGeral('');
-          setForm({ nome: '', dataNascimento: '', cpf: '', email: '', telefone: '' }); // Limpa o formulário
-        } else {
-          setMensagemErroGeral('Erro ao cadastrar o usuário.');
-          setMensagemSucesso('');
-          if (data && data.errors) {
-            setErros(data.errors); // Exibe erros específicos do backend (se houver)
-          } else if (data && data.message) {
-            setMensagemErroGeral(data.message); // Exibe uma mensagem de erro geral do backend
-          }
-        }
-      } catch (error) {
-        setMensagemErroGeral('Erro ao conectar com o servidor.');
-        setMensagemSucesso('');
-        console.error('Erro ao enviar dados:', error);
-      }
+      alert("Cadastro realizado com sucesso!");
     }
   };
 
@@ -134,9 +128,7 @@ function CadastroUsuario() {
       <div className="row justify-content-center">
         <div className="col-md-6 col-lg-4">
           <h1>Cadastro Usuário</h1>
-          {mensagemSucesso && <p className="alert alert-success">{mensagemSucesso}</p>}
-          {mensagemErroGeral && <p className="alert alert-danger">{mensagemErroGeral}</p>}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={validarFormulario}>
             <div className="mb-3">
               <label htmlFor="nome" className="form-label">Nome</label>
               <input
@@ -147,7 +139,7 @@ function CadastroUsuario() {
                 value={form.nome}
                 onChange={handleNomeChange}
               />
-              {erros.nome && <div className="invalid-feedback">{erros.nome}</div>}
+              {erros.nome && <div className="text-danger">{erros.nome}</div>}
             </div>
 
             <div className="mb-3">
@@ -160,7 +152,8 @@ function CadastroUsuario() {
                 onChange={handleChange}
                 max={new Date().toISOString().split("T")[0]}
               />
-              {erros.dataNascimento && <div className="invalid-feedback">{erros.dataNascimento}</div>}
+
+              {erros.dataNascimento && <div className="text-danger">{erros.dataNascimento}</div>}
             </div>
 
             <div className="mb-3">
@@ -174,7 +167,7 @@ function CadastroUsuario() {
                 onChange={mascaraCPF}
                 maxLength="14"
               />
-              {erros.cpf && <div className="invalid-feedback">{erros.cpf}</div>}
+              {erros.cpf && <div className="text-danger">{erros.cpf}</div>}
             </div>
 
             <div className="mb-3">
@@ -187,7 +180,7 @@ function CadastroUsuario() {
                 value={form.email}
                 onChange={handleChange}
               />
-              {erros.email && <div className="invalid-feedback">{erros.email}</div>}
+              {erros.email && <div className="text-danger">{erros.email}</div>}
             </div>
 
             <div className="mb-3">
@@ -202,13 +195,11 @@ function CadastroUsuario() {
                 onBlur={formatarTelefone}
                 maxLength="15"
               />
-              {erros.telefone && <div className="invalid-feedback">{erros.telefone}</div>}
+              {erros.telefone && <div className="text-danger">{erros.telefone}</div>}
             </div>
 
             <button type="submit" className="btn btn-primary">Cadastrar</button>
           </form>
-          {/* Você pode renderizar o componente ListaUsuarios aqui, se necessário */}
-          {/* <ListaUsuarios /> */}
         </div>
       </div>
     </div>
