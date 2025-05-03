@@ -2,133 +2,264 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function CadastroUsuario() {
-  const [form, setForm] = useState({
-    nome: "",
-    dataNascimento: "",
-    cpf: "",
-    email: "",
-    telefone: ""
+  // Estados para os campos do formulário
+  const [nome, setNome] = useState('');
+  const [dataNascimento, setDataNascimento] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [email, setEmail] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [senha, setSenha] = useState('');
+  const [repetirSenha, setRepetirSenha] = useState('');
+  const [checkboxMarcada, setCheckboxMarcada] = useState(false);
+  const [imagemPerfil, setImagemPerfil] = useState(null);
+  const [imagemPreview, setImagemPreview] = useState(null);
+
+  // Estado para os erros de validação
+  const [erros, setErros] = useState({
+    nome: '',
+    dataNascimento: '',
+    cpf: '',
+    email: '',
+    telefone: '',
+    senha: '',
+    repetirSenha: '',
+    termos: '',
+    imagemPerfil: ''
   });
 
-  const [erros, setErros] = useState({});
-
-  // Atualiza os valores do formulário
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setForm({ ...form, [id]: value });
-
-    // Remove erro ao digitar novamente
-    setErros({ ...erros, [id]: "" });
+  // Mensagens de erro predefinidas
+  const MENSAGENS_ERRO = {
+    SENHA_TAMANHO: 'A senha deve ter entre 8 e 16 caracteres.',
+    SENHA_COMPLEXIDADE: 'A senha deve conter pelo menos uma letra maiúscula, um número e um símbolo.',
+    SENHA_NAO_CONFERE: 'As senhas não coincidem.',
+    EMAIL_INVALIDO: 'Por favor, insira um email válido.',
+    TERMOS_NAO_ACEITOS: 'Você deve concordar com os termos de uso para cadastrar.',
+    NOME_CURTO: 'O nome deve ter pelo menos 3 caracteres.',
+    CPF_INVALIDO_FORMATO: 'CPF inválido! Use o formato 000.000.000-00.',
+    CPF_INVALIDO: 'CPF inválido!',
+    TELEFONE_INVALIDO: 'Telefone inválido! Use o formato (00)0000-0000 ou (00)00000-0000.',
+    DATA_NASCIMENTO_INVALIDA: 'A data de nascimento deve ser anterior à data atual.',
+    IMAGEM_PERFIL_INVALIDA: 'Formato de imagem inválido!'
   };
 
-  // Máscara para CPF
-  const mascaraCPF = (e) => {
+  // Expressões regulares para validação
+  const REGEX = {
+    SENHA: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,16}$/,
+    EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    CPF_FORMAT: /^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
+    TELEFONE_FORMAT: /^\(\d{2}\)\d{4,5}-\d{4}$/,
+    IMAGEM_PERFIL: /\.(jpe?g|png|gif)$/i
+  };
+
+  // Métodos de validação
+  const validarNome = (nome) => {
+    if (!nome.trim() || nome.trim().length < 3) {
+      return MENSAGENS_ERRO.NOME_CURTO;
+    }
+    return '';
+  };
+
+  const validarDataNascimento = (dataNascimento) => {
+    if (!dataNascimento) {
+      return MENSAGENS_ERRO.DATA_NASCIMENTO_INVALIDA;
+    }
+    const dataNasc = new Date(dataNascimento);
+    const hoje = new Date();
+    if (dataNasc > hoje) {
+      return MENSAGENS_ERRO.DATA_NASCIMENTO_INVALIDA;
+    }
+    return '';
+  };
+
+  const validarCPF = (cpf) => {
+    cpf = cpf.replace(/\D/g, "");
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+      return MENSAGENS_ERRO.CPF_INVALIDO;
+    }
+    let soma = 0, resto;
+    for (let i = 1; i <= 9; i++) soma += parseInt(cpf[i - 1]) * (11 - i);
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf[9])) return MENSAGENS_ERRO.CPF_INVALIDO;
+    soma = 0;
+    for (let i = 1; i <= 10; i++) soma += parseInt(cpf[i - 1]) * (12 - i);
+    resto = (soma * 10) % 11;
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf[10])) return MENSAGENS_ERRO.CPF_INVALIDO;
+    return '';
+  };
+
+  const validarTelefone = (telefone) => {
+    const telefoneNumerico = telefone.replace(/\D/g, '');
+    if (telefoneNumerico.length < 10 || telefoneNumerico.length > 11) {
+      return MENSAGENS_ERRO.TELEFONE_INVALIDO;
+    }
+    return '';
+  };
+
+  const validarSenha = (senha) => {
+    if (senha.length < 8 || senha.length > 16) {
+      return MENSAGENS_ERRO.SENHA_TAMANHO;
+    }
+    if (!REGEX.SENHA.test(senha)) {
+      return MENSAGENS_ERRO.SENHA_COMPLEXIDADE;
+    }
+    return '';
+  };
+
+  const validarRepetirSenha = (senha, repetirSenha) => {
+    if (senha !== repetirSenha) {
+      return MENSAGENS_ERRO.SENHA_NAO_CONFERE;
+    }
+    return '';
+  };
+
+  const validarEmail = (email) => {
+    if (!REGEX.EMAIL.test(email)) {
+      return MENSAGENS_ERRO.EMAIL_INVALIDO;
+    }
+    return '';
+  };
+
+
+
+  // Handlers de mudança
+  const handleNomeChange = (e) => {
+    setNome(e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, ''));
+    setErros({ ...erros, nome: validarNome(e.target.value) });
+  };
+
+  const handleDataNascimentoChange = (e) => {
+    setDataNascimento(e.target.value);
+    setErros({ ...erros, dataNascimento: validarDataNascimento(e.target.value) });
+  };
+
+  const handleCpfChange = (e) => {
     let valor = e.target.value.replace(/\D/g, '');
     if (valor.length <= 11) {
       valor = valor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
     }
-    setForm({ ...form, cpf: valor });
+    setCpf(valor);
+    setErros({ ...erros, cpf: validarCPF(valor) });
   };
 
-  const validarCPF = (cpf) => {
-    cpf = cpf.replace(/\D/g, ""); // Remove caracteres não numéricos
-
-    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
-      return false; // Verifica se tem 11 dígitos e se não é uma sequência repetida
-    }
-
-    let soma = 0, resto;
-
-    for (let i = 1; i <= 9; i++) {
-      soma += parseInt(cpf[i - 1]) * (11 - i);
-    }
-
-    resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf[9])) return false;
-
-    soma = 0;
-    for (let i = 1; i <= 10; i++) {
-      soma += parseInt(cpf[i - 1]) * (12 - i);
-    }
-
-    resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf[10])) return false;
-
-    return true;
-  };
-
-  // Atualiza telefone e só aplica a máscara quando completar a digitação
   const handleTelefoneChange = (e) => {
     let valor = e.target.value.replace(/\D/g, '');
     if (valor.length > 11) {
       valor = valor.slice(0, 11);
     }
-    setForm({ ...form, telefone: valor });
+    setTelefone(valor);
+    setErros({ ...erros, telefone: validarTelefone(valor) });
   };
 
-  // Aplica a máscara ao telefone quando o usuário terminar de digitar
   const formatarTelefone = () => {
-    let valor = form.telefone;
+    let valor = telefone;
     if (valor.length === 10) {
       valor = `(${valor.slice(0, 2)})${valor.slice(2, 6)}-${valor.slice(6)}`;
     } else if (valor.length === 11) {
       valor = `(${valor.slice(0, 2)})${valor.slice(2, 7)}-${valor.slice(7)}`;
     }
-    setForm({ ...form, telefone: valor });
+    setTelefone(valor);
   };
 
-  // Impede números e caracteres especiais no nome (permite apenas letras e espaços)
-    const handleNomeChange = (e) => {
-        let valor = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
-        setForm({ ...form, nome: valor });
-    };
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+    setErros({ ...erros, email: validarEmail(event.target.value) });
+  };
 
-  // Validação antes do envio
-  const validarFormulario = (e) => {
-    e.preventDefault();
-    let novosErros = {};
+  const handleSenhaChange = (event) => {
+    const novaSenha = event.target.value;
+    setSenha(novaSenha);
+    setErros({
+      ...erros,
+      senha: validarSenha(novaSenha),
+      repetirSenha: validarRepetirSenha(novaSenha, repetirSenha) // Passando novaSenha
+    });
+  };
 
-    if (!form.nome.trim() || form.nome.trim().length < 3) {
-      novosErros.nome = "O nome deve ter pelo menos 3 caracteres.";
-    }
-    if (!form.cpf.match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)) {
-      novosErros.cpf = "CPF inválido! Use o formato 000.000.000-00.";
-    }
-    if (!form.telefone.match(/^\(\d{2}\)\d{4,5}-\d{4}$/)) {
-      novosErros.telefone = "Telefone inválido! Use o formato (00)0000-0000.";
-    }
-    if (!form.email.trim()) {
-      novosErros.email = "Por favor, preencha o e-mail corretamente.";
-    }
-     if (!form.dataNascimento) {
-      novosErros.dataNascimento = "Por favor, preencha a data de nascimento.";
-    } else {
-      const dataNascimento = new Date(form.dataNascimento);
-      const hoje = new Date();
-      
-      if (dataNascimento > hoje) {
-        novosErros.dataNascimento = "A data de nascimento inválida.";
+  const handleRepetirSenhaChange = (event) => {
+    const novaRepetirSenha = event.target.value;
+    setRepetirSenha(novaRepetirSenha);
+    setErros({
+      ...erros,
+      repetirSenha: validarRepetirSenha(senha, novaRepetirSenha) // Passando novaRepetirSenha
+    });
+  };
+
+  const handleCheckboxChange = (event) => {
+    setCheckboxMarcada(event.target.checked);
+  };
+
+  const handleImagemChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!REGEX.IMAGEM_PERFIL.test(file.name)) {
+        setErros({ ...erros, imagemPerfil: MENSAGENS_ERRO.IMAGEM_PERFIL_INVALIDA });
+        return;
       }
-    }
-    if (!validarCPF(form.cpf)) {
-      novosErros.cpf = "CPF inválido!";
-    }
-
-    setErros(novosErros);
-
-    if (Object.keys(novosErros).length === 0) {
-      alert("Cadastro realizado com sucesso!");
+      
+      setImagemPerfil(file); // Armazena o arquivo original
+      setErros({ ...erros, imagemPerfil: '' });
+      
+      // Cria preview da imagem
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagemPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
+
+
+  // Validação do formulário e envio
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const nomeError = validarNome(nome);
+    const dataNascimentoError = validarDataNascimento(dataNascimento);
+    const cpfError = validarCPF(cpf);
+    const emailError = validarEmail(email);
+    const telefoneError = validarTelefone(telefone);
+    const senhaError = validarSenha(senha);
+    const repetirSenhaError = validarRepetirSenha(senha, repetirSenha);
+    let termosError = '';
+    
+
+
+    if (!checkboxMarcada) {
+      termosError = MENSAGENS_ERRO.TERMOS_NAO_ACEITOS;
+    }
+
+    setErros({
+      nome: nomeError,
+      dataNascimento: dataNascimentoError,
+      cpf: cpfError,
+      email: emailError,
+      telefone: telefoneError,
+      senha: senhaError,
+      repetirSenha: repetirSenhaError,
+      termos: termosError
+    });
+
+    if (nomeError || dataNascimentoError || cpfError || emailError || telefoneError || senhaError || repetirSenhaError || termosError) {
+      return;
+    }
+
+    alert('Cadastro realizado com sucesso!');
+  };
+
+  const hasErrors = () => {
+    return erros.nome || erros.dataNascimento || erros.cpf || erros.email || erros.telefone || erros.senha || erros.repetirSenha || erros.termos || erros.imagemPerfil;
+  };
+
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-4">
-          <h1>Cadastro Usuário</h1>
-          <form onSubmit={validarFormulario}>
+    <div className="container mt-4">
+      <h1 className="text-center mb-4">Cadastro de Usuário</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="row">
+          {/* Coluna 1: Informações do Usuário */}
+          <div className="col-md-6">
             <div className="mb-3">
               <label htmlFor="nome" className="form-label">Nome</label>
               <input
@@ -136,23 +267,22 @@ function CadastroUsuario() {
                 className={`form-control ${erros.nome ? 'is-invalid' : ''}`}
                 id="nome"
                 placeholder="Nome completo"
-                value={form.nome}
+                value={nome}
                 onChange={handleNomeChange}
               />
               {erros.nome && <div className="text-danger">{erros.nome}</div>}
             </div>
 
             <div className="mb-3">
-              <label htmlFor="dataNascimento" className="form-label">Data nascimento</label>
+              <label htmlFor="dataNascimento" className="form-label">Data de Nascimento</label>
               <input
                 type="date"
                 className={`form-control ${erros.dataNascimento ? 'is-invalid' : ''}`}
                 id="dataNascimento"
-                value={form.dataNascimento}
-                onChange={handleChange}
+                value={dataNascimento}
+                onChange={handleDataNascimentoChange}
                 max={new Date().toISOString().split("T")[0]}
               />
-
               {erros.dataNascimento && <div className="text-danger">{erros.dataNascimento}</div>}
             </div>
 
@@ -163,8 +293,8 @@ function CadastroUsuario() {
                 className={`form-control ${erros.cpf ? 'is-invalid' : ''}`}
                 id="cpf"
                 placeholder="000.000.000-00"
-                value={form.cpf}
-                onChange={mascaraCPF}
+                value={cpf}
+                onChange={handleCpfChange}
                 maxLength="14"
               />
               {erros.cpf && <div className="text-danger">{erros.cpf}</div>}
@@ -177,8 +307,8 @@ function CadastroUsuario() {
                 className={`form-control ${erros.email ? 'is-invalid' : ''}`}
                 id="email"
                 placeholder="E-mail"
-                value={form.email}
-                onChange={handleChange}
+                value={email}
+                onChange={handleEmailChange}
               />
               {erros.email && <div className="text-danger">{erros.email}</div>}
             </div>
@@ -190,18 +320,121 @@ function CadastroUsuario() {
                 className={`form-control ${erros.telefone ? 'is-invalid' : ''}`}
                 id="telefone"
                 placeholder="(00)00000-0000"
-                value={form.telefone}
+                value={telefone}
                 onChange={handleTelefoneChange}
                 onBlur={formatarTelefone}
                 maxLength="15"
               />
               {erros.telefone && <div className="text-danger">{erros.telefone}</div>}
             </div>
+          </div>
 
-            <button type="submit" className="btn btn-primary">Cadastrar</button>
-          </form>
+          {/* Coluna 2: Senha e Repetir Senha */}
+          <div className="col-md-6">
+          <div className="mb-3">
+              <label className="form-label">Imagem de Perfil</label>
+              <div className="d-flex align-items-center">
+                <div className="rounded-circle overflow-hidden me-3" style={{ width: '80px', height: '80px', backgroundColor: '#f8f9fa' }}>
+                  {imagemPreview ? (
+                    <img src={imagemPreview} alt="Preview" className="img-fluid" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                  ) : (
+                    <div className="w-100 h-100 d-flex align-items-center justify-content-center">
+                      <i className="bi bi-person fs-4 text-secondary"></i>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="file"
+                    id="imagemPerfil"
+                    accept="image/jpeg, image/png, image/gif"
+                    onChange={handleImagemChange}
+                    className="d-none"
+                  />
+                  <label
+                    htmlFor="imagemPerfil"
+                    className="btn btn-primary"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Escolher Imagem
+                  </label>
+                  {erros.imagemPerfil && (
+                    <div className="text-danger mt-2">{erros.imagemPerfil}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+          <div className="col-md-10">
+            <div className="mb-3">
+              <label htmlFor="inputPasswordCadastroLogin" className="form-label">Senha</label>
+              <input
+                type="password"
+                className={`form-control ${erros.senha ? 'is-invalid' : ''}`}
+                id="inputPasswordCadastroLogin"
+                placeholder="********"
+                value={senha}
+                onChange={handleSenhaChange}
+                required
+              />
+              {erros.senha && (
+                <small className="text-danger">{erros.senha}</small>
+              )}
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="inputRepetirPasswordCadastroLogin" className="form-label">Repetir Senha</label>
+              <input
+                type="password"
+                className={`form-control ${erros.repetirSenha ? 'is-invalid' : ''}`}
+                id="inputRepetirPasswordCadastroLogin"
+                placeholder="********"
+                value={repetirSenha}
+                onChange={handleRepetirSenhaChange}
+                required
+              />
+              {erros.repetirSenha && (
+                <small className="text-danger">{erros.repetirSenha}</small>
+              )}
+            </div>
+             <div id="passwordHelp" className="form-text mb-3">
+          A senha deve ter:
+          <ul className="mb-0">
+            <li>8 a 16 caracteres</li>
+            <li>Pelo menos uma letra maiúscula</li>
+            <li>Pelo menos um número</li>
+            <li>Pelo menos um símbolo</li>
+          </ul>
         </div>
-      </div>
+
+        <div className="mb-3 form-check">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="checkboxCadastroLogin"
+            checked={checkboxMarcada}
+            onChange={handleCheckboxChange}
+            required
+          />
+          <label className="form-check-label" htmlFor="checkboxCadastroLogin">
+            Concordo com os <a href="/politicas">Termos de uso.</a>
+          </label>
+        </div>
+          </div>
+        </div>
+</div>
+       
+
+        <div className="d-flex justify-content-center mt-4">
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={hasErrors()}
+        >
+          Cadastrar Usuário
+        </button>
+        </div>
+      </form>
     </div>
   );
 }

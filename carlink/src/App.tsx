@@ -8,22 +8,22 @@ import Login from './pages/Login';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './custom.scss';
-import CadastroLogin from './pages/CadastroLogin';
 import Index from './pages/Index';
 import Comprar from './pages/Comprar';
 import Politicas from './pages/Politicas';
 import Rodape from './components/Rodape';
 import CadastroUsuario from './pages/CadastroUsuario';
+import Admin from './pages/Gerenciamento';
 
 function App() {
   return (
-    <div>
-    <div className='container'>
+    <div className='d-flex flex-column min-vh-100'>
     <Router>
       <Navbar />
+      <main className='flex-grow-1 py-3'> {/* Adiciona padding vertical */}
+        <div className='container'>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/cadastro-login" element={<CadastroLogin />} />
         <Route path="/cadastro-carros" element={<CadastroCarros />} />
         <Route path="/cadastro-funcionario" element={<CadastroFuncionario />} />
         <Route path="/login" element={<Login />} />
@@ -31,10 +31,12 @@ function App() {
         <Route path="/politicas" element={<Politicas />} />
         <Route path="/comprar" element={<Comprar />} />
         <Route path="/cadastro-usuario" element={<CadastroUsuario />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
+      </div>
+      </main>
+      <Rodape/>
     </Router>
-    </div>
-    <Rodape/>
     </div>
   );
 }

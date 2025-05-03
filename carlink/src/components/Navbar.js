@@ -39,7 +39,7 @@ function Navbar() {
 
         {/* Caixa de busca e botões de login/cadastro */}
         <div className="d-flex align-items-center">
-          <Link className="btn btn-outline-primary me-2" to="/cadastro-login">
+          <Link className="btn btn-outline-primary me-2" to="/cadastro-usuario">
             Cadastrar
           </Link>
           <Link className="btn btn-primary" to="/login">
