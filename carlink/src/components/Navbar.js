@@ -37,7 +37,7 @@ function Navbar() {
           </ul>
         </div>
 
-        {/* Caixa de busca e botões de login/cadastro */}
+        {/* botões de login/cadastro */}
         <div className="d-flex align-items-center">
           <Link className="btn btn-outline-primary me-2" to="/cadastro-usuario">
             Cadastrar
