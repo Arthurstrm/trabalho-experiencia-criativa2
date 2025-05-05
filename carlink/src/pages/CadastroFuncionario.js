@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 function CadastroFuncionario() {
   const [form, setForm] = useState({
@@ -12,16 +14,40 @@ function CadastroFuncionario() {
 
   const [erros, setErros] = useState({});
 
-  // Atualiza os valores do formulário
+  const botaoCor = '#1a1a1a';
+
+  const erroAlerta = (mensagem) => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: mensagem,
+      confirmButtonColor: botaoCor,
+      confirmButtonText: 'Fechar',
+      customClass: {
+        confirmButton: 'custom-button'
+      }
+    });
+  };
+
+  const sucessoAlerta = (mensagem) => {
+    Swal.fire({
+      icon: 'success',
+      title: 'Sucesso!',
+      text: mensagem,
+      confirmButtonColor: botaoCor,
+      confirmButtonText: 'Fechar',
+      customClass: {
+        confirmButton: 'custom-button'
+      }
+    });
+  };
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setForm({ ...form, [id]: value });
-
-    // Remove erro ao digitar novamente
     setErros({ ...erros, [id]: "" });
   };
 
-  // Máscara para CPF
   const mascaraCPF = (e) => {
     let valor = e.target.value.replace(/\D/g, '');
     if (valor.length <= 11) {
@@ -31,11 +57,8 @@ function CadastroFuncionario() {
   };
 
   const validarCPF = (cpf) => {
-    cpf = cpf.replace(/\D/g, ""); // Remove caracteres não numéricos
-
-    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
-      return false; // Verifica se tem 11 dígitos e se não é uma sequência repetida
-    }
+    cpf = cpf.replace(/\D/g, "");
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
 
     let soma = 0, resto;
 
@@ -59,16 +82,12 @@ function CadastroFuncionario() {
     return true;
   };
 
-  // Atualiza telefone e só aplica a máscara quando completar a digitação
   const handleTelefoneChange = (e) => {
     let valor = e.target.value.replace(/\D/g, '');
-    if (valor.length > 11) {
-      valor = valor.slice(0, 11);
-    }
+    if (valor.length > 11) valor = valor.slice(0, 11);
     setForm({ ...form, telefone: valor });
   };
 
-  // Aplica a máscara ao telefone quando o usuário terminar de digitar
   const formatarTelefone = () => {
     let valor = form.telefone;
     if (valor.length === 10) {
@@ -79,13 +98,11 @@ function CadastroFuncionario() {
     setForm({ ...form, telefone: valor });
   };
 
-  // Impede números e caracteres especiais no nome (permite apenas letras e espaços)
   const handleNomeChange = (e) => {
     let valor = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
     setForm({ ...form, nome: valor });
   };
 
-  // Validação antes do envio
   const validarFormulario = (e) => {
     e.preventDefault();
     let novosErros = {};
@@ -110,9 +127,8 @@ function CadastroFuncionario() {
     } else {
       const dataNascimento = new Date(form.dataNascimento);
       const hoje = new Date();
-      
       if (dataNascimento > hoje) {
-        novosErros.dataNascimento = "A data de nascimento inválida.";
+        novosErros.dataNascimento = "A data de nascimento é inválida.";
       }
     }
     if (!validarCPF(form.cpf)) {
@@ -122,7 +138,9 @@ function CadastroFuncionario() {
     setErros(novosErros);
 
     if (Object.keys(novosErros).length === 0) {
-      alert("Cadastro realizado com sucesso!");
+      sucessoAlerta("Funcionário cadastrado com sucesso!");
+    } else {
+      erroAlerta("Por favor, corrija os erros no formulário.");
     }
   };
 
@@ -165,9 +183,8 @@ function CadastroFuncionario() {
                 id="dataNascimento"
                 value={form.dataNascimento}
                 onChange={handleChange}
-                max={new Date().toISOString().split("T")[0]} // Define o máximo para hoje
+                max={new Date().toISOString().split("T")[0]}
               />
-
               {erros.dataNascimento && <div className="text-danger">{erros.dataNascimento}</div>}
             </div>
 

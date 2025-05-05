@@ -1,110 +1,112 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+const botaoCor = '#1a1a1a'; // Cor mais escura
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [erros, setErros] = useState({
-    email: '',
-    senha: '',
+  const [form, setForm] = useState({
+    email: "",
+    senha: ""
   });
+  const [erros, setErros] = useState({});
 
-  const MENSAGENS_ERRO = {
-    EMAIL_INVALIDO: 'Por favor, insira um email válido.',
-    SENHA_INVALIDA: 'Senha incorreta. Tente novamente.',
+  const erroAlerta = (mensagem) => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: mensagem,
+      confirmButtonColor: botaoCor,
+      confirmButtonText: 'Fechar',
+      customClass: {
+        confirmButton: 'custom-button'
+      }
+    });
   };
 
-  const REGEX = {
-    EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  const sucessoAlerta = (mensagem) => {
+    Swal.fire({
+      icon: 'success',
+      title: 'Sucesso!',
+      text: mensagem,
+      confirmButtonColor: botaoCor,
+      confirmButtonText: 'Fechar',
+      customClass: {
+        confirmButton: 'custom-button'
+      }
+    });
+  };
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setForm({ ...form, [id]: value });
+    setErros({ ...erros, [id]: "" });
   };
 
   const validarEmail = (email) => {
-    if (!REGEX.EMAIL.test(email)) {
-      return MENSAGENS_ERRO.EMAIL_INVALIDO;
-    }
-    return '';
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const validarSenha = (senha) => {
-    if (senha.length < 6) {
-      return MENSAGENS_ERRO.SENHA_INVALIDA;
-    }
-    return '';
-  };
-
-  const handleEmailChange = (event) => {
-    const novoEmail = event.target.value;
-    setEmail(novoEmail);
-    setErros({ ...erros, email: validarEmail(novoEmail) });
-  };
-
-  const handleSenhaChange = (event) => {
-    const novaSenha = event.target.value;
-    setSenha(novaSenha);
-    setErros({ ...erros, senha: validarSenha(novaSenha) });
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const emailError = validarEmail(email);
-    const senhaError = validarSenha(senha);
-
-    if (emailError || senhaError) {
-      setErros({
-        email: emailError,
-        senha: senhaError,
-      });
-      return;
+  const validarFormulario = () => {
+    let novosErros = {};
+    if (!form.email.trim()) {
+      novosErros.email = "Este campo é obrigatório!";
+    } else if (!validarEmail(form.email)) {
+      novosErros.email = "Formato de email inválido!";
     }
 
-    alert('Login realizado com sucesso!');
+    if (!form.senha.trim()) {
+      novosErros.senha = "Este campo é obrigatório!";
+    } else if (form.senha.length < 6) {
+      novosErros.senha = "A senha deve ter pelo menos 6 caracteres!";
+    }
+
+    setErros(novosErros);
+    return Object.keys(novosErros).length === 0;
   };
 
-  const hasErrors = () => {
-    return erros.email || erros.senha;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (validarFormulario()) {
+      // Aqui você faria a lógica de autenticação real
+      sucessoAlerta("Login realizado com sucesso!");
+      // Redirecionar o usuário ou realizar outras ações após o login
+      console.log("Dados de login:", form);
+    } else {
+      erroAlerta("Preencha os campos corretamente.");
+    }
   };
+
+  const renderInput = (campo, tipo = "text") => (
+    <div className="mb-3" key={campo}>
+      <label htmlFor={campo} className="form-label">
+        {campo.charAt(0).toUpperCase() + campo.slice(1)}
+      </label>
+      <input
+        type={tipo}
+        className={`form-control py-2 ${erros[campo] ? 'is-invalid' : ''}`}
+        id={campo}
+        value={form[campo]}
+        onChange={handleChange}
+        placeholder={`Digite seu ${campo}`}
+      />
+      {erros[campo] && <div className="text-danger">{erros[campo]}</div>}
+    </div>
+  );
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-4">
-          <h1>Login</h1>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="inputEmailLogin" className="form-label">Email</label>
-              <input
-                type="email"
-                className={`form-control ${erros.email ? 'is-invalid' : ''}`}
-                id="inputEmailLogin"
-                placeholder="exemplo@email.com"
-                value={email}
-                onChange={handleEmailChange}
-                required
-              />
-              {erros.email && <small className="text-danger">{erros.email}</small>}
-            </div>
-            <div className="mb-3">
-              <label htmlFor="inputPasswordLogin" className="form-label">Senha</label>
-              <input
-                type="password"
-                className={`form-control ${erros.senha ? 'is-invalid' : ''}`}
-                id="inputPasswordLogin"
-                placeholder="********"
-                value={senha}
-                onChange={handleSenhaChange}
-                required
-              />
-              {erros.senha && <small className="text-danger">{erros.senha}</small>}
-            </div>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={hasErrors()}
-            >
-              Entrar
-            </button>
-          </form>
+    <div className="container mt-5" style={{ maxWidth: "400px" }}>
+      <h1 className="mb-4">Login</h1>
+      <form onSubmit={handleSubmit}>
+        {renderInput("email", "email")}
+        {renderInput("senha", "password")}
+        <div className="d-flex justify-content-start mt-3">
+          <button type="submit" className="btn btn-primary px-4 py-2" style={{ backgroundColor: botaoCor, borderColor: botaoCor }}>
+            Entrar
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
