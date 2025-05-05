@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+const botaoCor = '#1a1a1a';
 
 function CadastroUsuario() {
   // Estados para os campos do formulário
@@ -121,7 +125,31 @@ function CadastroUsuario() {
     return '';
   };
 
+  const erroAlerta = (mensagem) => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Erro',
+      text: mensagem,
+      confirmButtonColor: botaoCor,
+      confirmButtonText: 'Fechar',
+      customClass: {
+        confirmButton: 'custom-button'
+      }
+    });
+  };
 
+  const sucessoAlerta = (mensagem) => {
+    Swal.fire({
+      icon: 'success',
+      title: 'Sucesso!',
+      text: mensagem,
+      confirmButtonColor: botaoCor,
+      confirmButtonText: 'OK',
+      customClass: {
+        confirmButton: 'custom-button'
+      }
+    });
+  };
 
   // Handlers de mudança
   const handleNomeChange = (e) => {
@@ -162,6 +190,7 @@ function CadastroUsuario() {
     setTelefone(valor);
   };
 
+
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
     setErros({ ...erros, email: validarEmail(event.target.value) });
@@ -173,7 +202,7 @@ function CadastroUsuario() {
     setErros({
       ...erros,
       senha: validarSenha(novaSenha),
-      repetirSenha: validarRepetirSenha(novaSenha, repetirSenha) // Passando novaSenha
+      repetirSenha: validarRepetirSenha(novaSenha, repetirSenha)
     });
   };
 
@@ -182,7 +211,7 @@ function CadastroUsuario() {
     setRepetirSenha(novaRepetirSenha);
     setErros({
       ...erros,
-      repetirSenha: validarRepetirSenha(senha, novaRepetirSenha) // Passando novaRepetirSenha
+      repetirSenha: validarRepetirSenha(senha, novaRepetirSenha)
     });
   };
 
@@ -197,11 +226,10 @@ function CadastroUsuario() {
         setErros({ ...erros, imagemPerfil: MENSAGENS_ERRO.IMAGEM_PERFIL_INVALIDA });
         return;
       }
-      
-      setImagemPerfil(file); // Armazena o arquivo original
+
+      setImagemPerfil(file);
       setErros({ ...erros, imagemPerfil: '' });
-      
-      // Cria preview da imagem
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagemPreview(reader.result);
@@ -209,7 +237,6 @@ function CadastroUsuario() {
       reader.readAsDataURL(file);
     }
   };
-
 
   // Validação do formulário e envio
   const handleSubmit = (event) => {
@@ -223,8 +250,6 @@ function CadastroUsuario() {
     const senhaError = validarSenha(senha);
     const repetirSenhaError = validarRepetirSenha(senha, repetirSenha);
     let termosError = '';
-    
-
 
     if (!checkboxMarcada) {
       termosError = MENSAGENS_ERRO.TERMOS_NAO_ACEITOS;
@@ -242,16 +267,23 @@ function CadastroUsuario() {
     });
 
     if (nomeError || dataNascimentoError || cpfError || emailError || telefoneError || senhaError || repetirSenhaError || termosError) {
+      erroAlerta('Por favor, corrija os erros no formulário.');
       return;
     }
 
-    alert('Cadastro realizado com sucesso!');
-  };
+    sucessoAlerta('Cadastro realizado com sucesso!');
 
-  const hasErrors = () => {
-    return erros.nome || erros.dataNascimento || erros.cpf || erros.email || erros.telefone || erros.senha || erros.repetirSenha || erros.termos || erros.imagemPerfil;
+    console.log('Dados do formulário:', {
+      nome,
+      dataNascimento,
+      cpf,
+      email,
+      telefone,
+      senha,
+      checkboxMarcada,
+      imagemPerfil
+    });
   };
-
 
   return (
     <div className="container mt-4">
@@ -331,7 +363,7 @@ function CadastroUsuario() {
 
           {/* Coluna 2: Senha e Repetir Senha */}
           <div className="col-md-6">
-          <div className="mb-3">
+            <div className="mb-3">
               <label className="form-label">Imagem de Perfil</label>
               <div className="d-flex align-items-center">
                 <div className="rounded-circle overflow-hidden me-3" style={{ width: '80px', height: '80px', backgroundColor: '#f8f9fa' }}>
@@ -354,7 +386,7 @@ function CadastroUsuario() {
                   <label
                     htmlFor="imagemPerfil"
                     className="btn btn-primary"
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', backgroundColor: botaoCor, borderColor: botaoCor }}
                   >
                     Escolher Imagem
                   </label>
@@ -365,74 +397,71 @@ function CadastroUsuario() {
               </div>
             </div>
 
-          <div className="col-md-10">
-            <div className="mb-3">
-              <label htmlFor="inputPasswordCadastroLogin" className="form-label">Senha</label>
-              <input
-                type="password"
-                className={`form-control ${erros.senha ? 'is-invalid' : ''}`}
-                id="inputPasswordCadastroLogin"
-                placeholder="********"
-                value={senha}
-                onChange={handleSenhaChange}
-                required
-              />
-              {erros.senha && (
-                <small className="text-danger">{erros.senha}</small>
-              )}
-            </div>
+            <div className="col-md-10">
+              <div className="mb-3">
+                <label htmlFor="senha" className="form-label">Senha</label>
+                <input
+                  type="password"
+                  className={`form-control ${erros.senha ? 'is-invalid' : ''}`}
+                  id="senha"
+                  placeholder="********"
+                  value={senha}
+                  onChange={handleSenhaChange} />
+                {erros.senha && (
+                  <small className="text-danger">{erros.senha}</small>
+                )}
+              </div>
 
-            <div className="mb-3">
-              <label htmlFor="inputRepetirPasswordCadastroLogin" className="form-label">Repetir Senha</label>
-              <input
-                type="password"
-                className={`form-control ${erros.repetirSenha ? 'is-invalid' : ''}`}
-                id="inputRepetirPasswordCadastroLogin"
-                placeholder="********"
-                value={repetirSenha}
-                onChange={handleRepetirSenhaChange}
-                required
-              />
-              {erros.repetirSenha && (
-                <small className="text-danger">{erros.repetirSenha}</small>
-              )}
-            </div>
-             <div id="passwordHelp" className="form-text mb-3">
-          A senha deve ter:
-          <ul className="mb-0">
-            <li>8 a 16 caracteres</li>
-            <li>Pelo menos uma letra maiúscula</li>
-            <li>Pelo menos um número</li>
-            <li>Pelo menos um símbolo</li>
-          </ul>
-        </div>
+              <div className="mb-3">
+                <label htmlFor="repetirSenha" className="form-label">Repetir Senha</label>
+                <input
+                  type="password"
+                  className={`form-control ${erros.repetirSenha ? 'is-invalid' : ''}`}
+                  id="repetirSenha"
+                  placeholder="********"
+                  value={repetirSenha}
+                  onChange={handleRepetirSenhaChange}
+                />
+                {erros.repetirSenha && (
+                  <small className="text-danger">{erros.repetirSenha}</small>
+                )}
+              </div>
+              <div id="passwordHelp" className="form-text mb-3">
+                A senha deve ter:
+                <ul className="mb-0">
+                  <li>8 a 16 caracteres</li>
+                  <li>Pelo menos uma letra maiúscula</li>
+                  <li>Pelo menos um número</li>
+                  <li>Pelo menos um símbolo</li>
+                </ul>
+              </div>
 
-        <div className="mb-3 form-check">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            id="checkboxCadastroLogin"
-            checked={checkboxMarcada}
-            onChange={handleCheckboxChange}
-            required
-          />
-          <label className="form-check-label" htmlFor="checkboxCadastroLogin">
-            Concordo com os <a href="/politicas">Termos de uso.</a>
-          </label>
-        </div>
+              <div className="mb-3 form-check">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="termos"
+                  checked={checkboxMarcada}
+                  onChange={handleCheckboxChange}
+                />
+                <label className="form-check-label" htmlFor="termos">
+                  Concordo com os <a href="/politicas">Termos de uso.</a>
+                </label>
+                {erros.termos && <div className="text-danger">{erros.termos}</div>}
+              </div>
+            </div>
           </div>
         </div>
-</div>
-       
+
 
         <div className="d-flex justify-content-center mt-4">
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={hasErrors()}
-        >
-          Cadastrar Usuário
-        </button>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ backgroundColor: botaoCor, borderColor: botaoCor }}
+          >
+            Cadastrar Usuário
+          </button>
         </div>
       </form>
     </div>
