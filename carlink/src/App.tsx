@@ -1,4 +1,5 @@
-import React from 'react';
+// App.tsx
+import React, { useState, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import SobreNos from './pages/SobreNos';
@@ -16,31 +17,50 @@ import CadastroUsuario from './pages/CadastroUsuario';
 import Usuarios from './admin/usuarios';
 import useInactivityLogout from './components/inatividade';
 
+interface Usuario {
+  id_usuario: number;
+  nome: string;
+  genero: string;
+  dataNascimento: string; // Ou Date
+  cpf: string;
+  email: string;
+  telefone: string;
+  senha?: string;
+  imagemPerfil?: any;
+}
+
 function App() {
-  useInactivityLogout(5); // Chama a função de inatividade
+  const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(() => {
+    const storedUser = localStorage.getItem('usuario');
+    return storedUser ? JSON.parse(storedUser) as Usuario : null;
+  });
+  const handleInactiveLogout = useCallback(() => {
+    setUsuarioLogado(null);
+  }, [setUsuarioLogado]);
+
+  useInactivityLogout(1, handleInactiveLogout);
+
   return (
     <div className='d-flex flex-column min-vh-100'>
-    <Router>
-      
-      <main className='flex-grow-1 py-3'> {/* Adiciona padding vertical */}
-        <div className='container'>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/cadastro-carros" element={<CadastroCarros />} />
-        <Route path="/cadastro-funcionario" element={<CadastroFuncionario />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/sobre-nos" element={<SobreNos />} />
-        <Route path="/politicas" element={<Politicas />} />
-        <Route path="/comprar" element={<Comprar />} />
-        <Route path="/cadastro-usuario" element={<CadastroUsuario />} />
-        <Route path="/usuarios" element={<Usuarios />} />
-       
-      </Routes>
-      </div>
-      </main>
-      <Rodape/>
-    </Router>
+      <Router>
+        <Navbar usuario={usuarioLogado} />
+        <main className='flex-grow-1 py-3'>
+          <div className='container'>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/cadastro-carros" element={<CadastroCarros />} />
+              <Route path="/cadastro-funcionario" element={<CadastroFuncionario />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/sobre-nos" element={<SobreNos />} />
+              <Route path="/politicas" element={<Politicas />} />
+              <Route path="/comprar" element={<Comprar />} />
+              <Route path="/cadastro-usuario" element={<CadastroUsuario />} />
+              <Route path="/usuarios" element={<Usuarios />} />
+            </Routes>
+          </div>
+        </main>
+        <Rodape/>
+      </Router>
     </div>
   );
 }

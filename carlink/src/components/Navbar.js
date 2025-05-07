@@ -1,23 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../img/logoCarlink-Escura.svg';
+import PropTypes from 'prop-types';
 
-
-function Navbar() {
-  const [usuario, setUsuario] = useState(null);
-
-  useEffect(() => {
-    // Verifica se o usuário está logado ao carregar o componente
-    const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
-    if (usuarioLogado) {
-      setUsuario(usuarioLogado);
-    }
-  }, []);
-
+function Navbar({ usuario }) {
   const handleLogout = () => {
     localStorage.removeItem('usuario');
-    setUsuario(null);
-    // Redireciona para a página inicial
     window.location.href = '/';
   };
 
@@ -59,14 +47,14 @@ function Navbar() {
         <div className="d-flex align-items-center">
           {usuario ? (
             <div className="dropdown">
-              <button 
-                className="btn btn-outline-primary dropdown-toggle" 
-                type="button" 
-                id="dropdownMenuButton" 
-                data-bs-toggle="dropdown" 
+              <button
+                className="btn btn-outline-primary dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                Olá, {usuario.nome.split(' ')[0]} {/* Mostra apenas o primeiro nome */}
+                Olá, {usuario.nome?.split(' ')[0]}
               </button>
               <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <li>
@@ -101,5 +89,17 @@ function Navbar() {
     </nav>
   );
 }
+
+Navbar.propTypes = {
+  usuario: PropTypes.shape({
+    id_usuario: PropTypes.number,
+    nome: PropTypes.string,
+    genero: PropTypes.string,
+    dataNascimento: PropTypes.string,
+    cpf: PropTypes.string.isRequired,
+    email: PropTypes.string,
+    telefone: PropTypes.string,
+  }),
+};
 
 export default Navbar;

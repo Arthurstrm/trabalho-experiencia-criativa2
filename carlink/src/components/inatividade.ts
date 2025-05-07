@@ -1,26 +1,42 @@
 import { useEffect, useRef } from 'react';
 
-const useInactivityLogout = (timeoutMinutes = 5) => {
-  // Corrigindo a declaração do useRef com valor inicial null
+interface Usuario {
+  id_usuario: number;
+  nome: string;
+  genero: string;
+  dataNascimento: string; // Ou Date, dependendo de como você manipula no frontend
+  cpf: string;
+  email: string;
+  telefone: string;
+  senha?: string; // A senha geralmente não é armazenada no estado do frontend
+  imagemPerfil?: any; // LONGBLOB pode ser tratado como 'any' no frontend inicialmente
+}
+
+interface LogoutCallback {
+  (): void;
+}
+
+const useInactivityLogout = (timeoutMinutes = 5, onLogout?: LogoutCallback) => {
   const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const logout = () => {
       localStorage.removeItem('token');
-      window.location.href = '/login?reason=inactivity';
+      localStorage.removeItem('usuario');
+      if (onLogout) {
+        onLogout();
+      } else {
+        window.location.href = '/login?reason=inactivity';
+      }
     };
 
     const resetTimer = () => {
-      // Limpa o timer existente com verificação de null
       if (inactivityTimer.current) {
         clearTimeout(inactivityTimer.current);
       }
-      
-      // Configura novo timer
       inactivityTimer.current = setTimeout(logout, timeoutMinutes * 60 * 1000);
     };
 
-    // Eventos que resetam o timer
     const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
 
     const handleEvent = () => {
@@ -28,15 +44,12 @@ const useInactivityLogout = (timeoutMinutes = 5) => {
       localStorage.setItem('lastActivity', Date.now().toString());
     };
 
-    // Adiciona listeners
     events.forEach(event => {
       window.addEventListener(event, handleEvent);
     });
 
-    // Inicia o timer
     resetTimer();
 
-    // Limpeza
     return () => {
       if (inactivityTimer.current) {
         clearTimeout(inactivityTimer.current);
@@ -45,7 +58,7 @@ const useInactivityLogout = (timeoutMinutes = 5) => {
         window.removeEventListener(event, handleEvent);
       });
     };
-  }, [timeoutMinutes]);
+  }, [timeoutMinutes, onLogout]);
 };
 
 export default useInactivityLogout;
