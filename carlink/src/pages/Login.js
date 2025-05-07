@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-const botaoCor = '#1a1a1a'; // Cor mais escura
+const botaoCor = '#1a1a1a';
 
 function Login() {
   const [form, setForm] = useState({
@@ -10,25 +11,13 @@ function Login() {
     senha: ""
   });
   const [erros, setErros] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const erroAlerta = (mensagem) => {
-    Swal.fire({
-      icon: 'error',
-      title: 'Erro',
-      text: mensagem,
-      confirmButtonColor: botaoCor,
-      confirmButtonText: 'Fechar',
-      customClass: {
-        confirmButton: 'custom-button'
-      }
-    });
-  };
-
-  const sucessoAlerta = (mensagem) => {
-    Swal.fire({
-      icon: 'success',
-      title: 'Sucesso!',
-      text: mensagem,
+  const showAlert = (icon, title, text) => {
+    return Swal.fire({
+      icon,
+      title,
+      text,
       confirmButtonColor: botaoCor,
       confirmButtonText: 'Fechar',
       customClass: {
@@ -65,16 +54,51 @@ function Login() {
     return Object.keys(novosErros).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    if (validarFormulario()) {
-      // Aqui você faria a lógica de autenticação real
-      sucessoAlerta("Login realizado com sucesso!");
-      // Redirecionar o usuário ou realizar outras ações após o login
-      console.log("Dados de login:", form);
-    } else {
-      erroAlerta("Preencha os campos corretamente.");
+    if (!validarFormulario()) {
+      await showAlert('error', 'Erro', 'Preencha os campos corretamente.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8800/auth/login', {
+        email: form.email,
+        senha: form.senha
+      });
+
+      // Armazenar token e dados do usuário
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('usuario', JSON.stringify({
+        id: response.data.user.id,
+        nome: response.data.user.nome,
+        email: response.data.user.email
+      }));
+
+      await showAlert('success', 'Sucesso!', 'Login realizado com sucesso!');
+      
+      
+      
+        window.location.href = '/';
+      
+
+    } catch (error) {
+      let errorMessage = "Erro ao conectar com o servidor";
+      
+      if (error.response) {
+        if (error.response.status === 401) {
+          errorMessage = "Email ou senha incorretos!";
+        } else if (error.response.status === 404) {
+          errorMessage = "Rota não encontrada";
+        }
+      }
+
+      await showAlert('error', 'Erro', errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,7 +113,7 @@ function Login() {
         id={campo}
         value={form[campo]}
         onChange={handleChange}
-        placeholder={`Digite seu ${campo}`}
+        placeholder={`${campo}`}
       />
       {erros[campo] && <div className="text-danger">{erros[campo]}</div>}
     </div>
@@ -102,8 +126,18 @@ function Login() {
         {renderInput("email", "email")}
         {renderInput("senha", "password")}
         <div className="d-flex justify-content-start mt-3">
-          <button type="submit" className="btn btn-primary px-4 py-2" style={{ backgroundColor: botaoCor, borderColor: botaoCor }}>
-            Entrar
+          <button 
+            type="submit" 
+            className="btn btn-primary px-4 py-2" 
+            style={{ backgroundColor: botaoCor, borderColor: botaoCor }}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Carregando...
+              </>
+            ) : 'Entrar'}
           </button>
         </div>
       </form>

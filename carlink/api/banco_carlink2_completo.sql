@@ -28,7 +28,7 @@ CREATE TABLE Usuario (
     cpf VARCHAR(14) UNIQUE,
     email VARCHAR(100),  
     telefone VARCHAR(20),
-    senha VARCHAR(50),
+    senha VARCHAR(255),
     imagemPerfil LONGBLOB
 );
 
@@ -300,5 +300,5 @@ INSERT INTO Cargo (nome, acesso) VALUES
 ('atendente', 3);
 
 INSERT INTO Usuario (nome, genero, dataNascimento, cpf, email, telefone, senha) VALUES
-('Carlink', 'Masculino', '1990-01-01', '12345678901', 'carlink@carlink.com', '11987654321', 'Senha@123');
+('Carlink', 'Masculino', '1990-01-01', '12345678901', 'carlink@carlink.com', '11987654321', '$2b$10$fTKCqCYvJr9Ad2VAHvlw8OPo2dsSfAbaiAOxoNmWmpIk1JVQvAzBK');
 

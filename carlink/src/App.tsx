@@ -13,9 +13,11 @@ import Comprar from './pages/Comprar';
 import Politicas from './pages/Politicas';
 import Rodape from './components/Rodape';
 import CadastroUsuario from './pages/CadastroUsuario';
-import Admin from './pages/Gerenciamento';
+import Usuarios from './admin/usuarios';
+import useInactivityLogout from './components/inatividade';
 
 function App() {
+  useInactivityLogout(5); // Chama a função de inatividade
   return (
     <div className='d-flex flex-column min-vh-100'>
     <Router>
@@ -32,7 +34,8 @@ function App() {
         <Route path="/politicas" element={<Politicas />} />
         <Route path="/comprar" element={<Comprar />} />
         <Route path="/cadastro-usuario" element={<CadastroUsuario />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/usuarios" element={<Usuarios />} />
+       
       </Routes>
       </div>
       </main>
