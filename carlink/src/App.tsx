@@ -16,6 +16,7 @@ import Rodape from './components/Rodape';
 import CadastroUsuario from './pages/CadastroUsuario';
 import Usuarios from './admin/usuarios';
 import useInactivityLogout from './components/inatividade';
+import Perfil from './pages/perfil'; // no topo
 
 interface Usuario {
   id_usuario: number;
@@ -57,6 +58,7 @@ function App() {
               <Route path="/comprar" element={<Comprar />} />
               <Route path="/cadastro-usuario" element={<CadastroUsuario />} />
               <Route path="/usuarios" element={<Usuarios />} />
+              <Route path="/perfil" element={<Perfil />} />
             </Routes>
           </div>
         </main>

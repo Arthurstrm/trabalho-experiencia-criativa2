@@ -17,6 +17,19 @@ export const getUsuarios = (_, res) => {
 };
 
 // Adicione outras operações CRUD aqui
+
+export const createFuncionario = async (req, res) => { 
+  const { nome, genero, cpf, dataNascimento, telefone, email, cargo } = req.body;
+  
+  const q = "INSERT INTO funcionario (nome, genero, cpf, dataNascimento, telefone, email, cargo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  
+  db.query(q, [nome, genero, cpf, dataNascimento, telefone, email, cargo], (err) => {
+      if (err) return res.status(500).json(err);
+      
+      return res.status(201).json("Funcionario criado com sucesso!");
+  });
+};
+
 export const createUsuario = async (req, res) => { 
     const { nome, genero, dataNascimento, cpf, email, telefone, senha, imagem } = req.body;
     
