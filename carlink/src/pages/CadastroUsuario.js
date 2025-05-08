@@ -9,6 +9,7 @@ const botaoCor = '#1a1a1a';
 function CadastroUsuario() {
   // Estados para os campos do formulário
   const [nome, setNome] = useState('');
+  const [genero, setGenero] = useState('');
   const [dataNascimento, setDataNascimento] = useState('');
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
@@ -44,7 +45,8 @@ function CadastroUsuario() {
     CPF_INVALIDO: 'CPF inválido!',
     TELEFONE_INVALIDO: 'Telefone inválido! Use o formato (00)0000-0000 ou (00)00000-0000.',
     DATA_NASCIMENTO_INVALIDA: 'A data de nascimento deve ser anterior à data atual.',
-    IMAGEM_PERFIL_INVALIDA: 'Formato de imagem inválido!'
+    IMAGEM_PERFIL_INVALIDA: 'Formato de imagem inválido!',
+    GENERO_INVALIDO: 'Por favor, selecione seu gênero.'
   };
 
   // Expressões regulares para validação
@@ -63,6 +65,13 @@ function CadastroUsuario() {
     }
     return '';
   };
+
+  const validarGenero = (genero) => {
+    if (!genero) {
+        return MENSAGENS_ERRO.GENERO_INVALIDO;
+    }
+    return '';
+};
 
   const validarDataNascimento = (dataNascimento) => {
     if (!dataNascimento) {
@@ -158,6 +167,11 @@ function CadastroUsuario() {
     setErros({ ...erros, nome: validarNome(e.target.value) });
   };
 
+  const handleGeneroChange = (e) => {
+    setGenero(e.target.value);
+    setErros({ ...erros, genero: validarGenero(e.target.value) });
+};
+
   const handleDataNascimentoChange = (e) => {
     setDataNascimento(e.target.value);
     setErros({ ...erros, dataNascimento: validarDataNascimento(e.target.value) });
@@ -244,6 +258,7 @@ function CadastroUsuario() {
     event.preventDefault();
 
     const nomeError = validarNome(nome);
+    const generoError = validarGenero(genero);
     const dataNascimentoError = validarDataNascimento(dataNascimento);
     const cpfError = validarCPF(cpf);
     const emailError = validarEmail(email);
@@ -262,6 +277,7 @@ function CadastroUsuario() {
     }
     setErros({
       nome: nomeError,
+      genero: generoError,
       dataNascimento: dataNascimentoError,
       cpf: cpfError,
       email: emailError,
@@ -271,7 +287,7 @@ function CadastroUsuario() {
       termos: termosError
     });
 
-    if (nomeError || dataNascimentoError || cpfError || emailError || telefoneError || senhaError || repetirSenhaError || termosError) {
+    if (nomeError || generoError || dataNascimentoError || cpfError || emailError || telefoneError || senhaError || repetirSenhaError || termosError) {
       erroAlerta('Por favor, corrija os erros no formulário.');
       return;
     }
@@ -280,6 +296,7 @@ function CadastroUsuario() {
 
     console.log('Dados do formulário:', {
       nome,
+      genero,
       dataNascimento,
       cpf,
       email,
@@ -293,6 +310,7 @@ function CadastroUsuario() {
       // Cria FormData para enviar a imagem
       const formData = new FormData();
       formData.append('nome', nome);
+      formData.append('genero', genero);
       formData.append('dataNascimento', dataNascimento);
       formData.append('cpf', cpf.replace(/\D/g, ''));
       formData.append('email', email);
@@ -346,6 +364,23 @@ function CadastroUsuario() {
               />
               {erros.nome && <div className="text-danger">{erros.nome}</div>}
             </div>
+
+            <div className="mb-3">
+                    <label htmlFor="genero" className="form-label">Gênero</label>
+                    <select
+                        className={`form-select ${erros.genero ? 'is-invalid' : ''}`}
+                        id="genero"
+                        value={genero}
+                        onChange={handleGeneroChange}
+                    >
+                        <option value="">Selecione</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="feminino">Feminino</option>
+                        <option value="nao-binario">Não binário/gênero não conforme</option>
+                        <option value="prefiro-nao-dizer">Prefiro não dizer</option>
+                    </select>
+                    {erros.genero && <div className="text-danger">{erros.genero}</div>}
+                </div>
 
             <div className="mb-3">
               <label htmlFor="dataNascimento" className="form-label">Data de Nascimento</label>

@@ -43,9 +43,10 @@ function App() {
   return (
     <div className='d-flex flex-column min-vh-100'>
       <Router>
-        <Navbar usuario={usuarioLogado} />
+        
         <main className='flex-grow-1 py-3'>
           <div className='container'>
+          <Navbar usuario={usuarioLogado} />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/cadastro-carros" element={<CadastroCarros />} />

@@ -63,11 +63,6 @@ function Navbar({ usuario }) {
                   </Link>
                 </li>
                 <li>
-                  <Link className="dropdown-item" to="/configuracoes">
-                    Configurações
-                  </Link>
-                </li>
-                <li>
                   <button className="dropdown-item" onClick={handleLogout}>
                     Sair
                   </button>
