@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-, "api/middleware/uploads.js"  ]
+, "api/middleware/uploads.js", "perfil", "perfil/1.js"  ]
 }

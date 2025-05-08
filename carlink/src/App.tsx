@@ -16,13 +16,13 @@ import Rodape from './components/Rodape';
 import CadastroUsuario from './pages/CadastroUsuario';
 import Usuarios from './admin/usuarios';
 import useInactivityLogout from './components/inatividade';
-import Perfil from './pages/perfil'; // no topo
+import Perfil from './pages/perfil';
 
 interface Usuario {
   id_usuario: number;
   nome: string;
   genero: string;
-  dataNascimento: string; // Ou Date
+  dataNascimento: string; 
   cpf: string;
   email: string;
   telefone: string;
@@ -33,13 +33,12 @@ interface Usuario {
 function App() {
   const [usuarioLogado, setUsuarioLogado] = useState<Usuario | null>(() => {
     const storedUser = localStorage.getItem('usuario');
-    return storedUser ? JSON.parse(storedUser) as Usuario : null;
+    const user = storedUser ? JSON.parse(storedUser) as Usuario : null;
+    console.log("Usuario Logado no App:", user); 
+    return user;
   });
-  const handleInactiveLogout = useCallback(() => {
-    setUsuarioLogado(null);
-  }, [setUsuarioLogado]);
-
-  useInactivityLogout(1, handleInactiveLogout);
+  
+  useInactivityLogout(1);
 
   return (
     <div className='d-flex flex-column min-vh-100'>
@@ -58,7 +57,7 @@ function App() {
               <Route path="/comprar" element={<Comprar />} />
               <Route path="/cadastro-usuario" element={<CadastroUsuario />} />
               <Route path="/usuarios" element={<Usuarios />} />
-              <Route path="/perfil" element={<Perfil />} />
+              <Route path="/perfil/:id" element={<Perfil />} />
             </Routes>
           </div>
         </main>

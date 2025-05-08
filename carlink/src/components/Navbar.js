@@ -1,11 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import logo from '../img/logoCarlink-Escura.svg';
-import PropTypes from 'prop-types';
 
 function Navbar({ usuario }) {
+   const { id } = useParams();
+  
   const handleLogout = () => {
     localStorage.removeItem('usuario');
+    localStorage.removeItem('token'); // Remova o token também
     window.location.href = '/';
   };
 
@@ -54,11 +56,12 @@ function Navbar({ usuario }) {
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                Olá, {usuario.nome?.split(' ')[0]}
+                {/* Exibe "Olá, Usuário" se o nome não estiver disponível */}
+                Olá, {usuario.nome?.split(' ')[0] || 'Usuário'}
               </button>
               <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <li>
-                  <Link className="dropdown-item" to="/perfil">
+                  <Link className="dropdown-item" to={`/perfil/` + id}>
                     Meu Perfil
                   </Link>
                 </li>
@@ -85,16 +88,6 @@ function Navbar({ usuario }) {
   );
 }
 
-Navbar.propTypes = {
-  usuario: PropTypes.shape({
-    id_usuario: PropTypes.number,
-    nome: PropTypes.string,
-    genero: PropTypes.string,
-    dataNascimento: PropTypes.string,
-    cpf: PropTypes.string.isRequired,
-    email: PropTypes.string,
-    telefone: PropTypes.string,
-  }),
-};
+
 
 export default Navbar;

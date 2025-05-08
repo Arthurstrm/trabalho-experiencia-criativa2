@@ -24,10 +24,9 @@ const useInactivityLogout = (timeoutMinutes = 5, onLogout?: LogoutCallback) => {
       localStorage.removeItem('token');
       localStorage.removeItem('usuario');
       if (onLogout) {
-        onLogout();
-      } else {
-        window.location.href = '/login?reason=inactivity';
+        onLogout(); // Executa lógica adicional se fornecida
       }
+      window.location.href = '/login?reason=inactivity';
     };
 
     const resetTimer = () => {

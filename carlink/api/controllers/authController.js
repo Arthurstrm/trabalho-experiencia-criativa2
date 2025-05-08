@@ -39,7 +39,8 @@ export const login = async (req, res) => {
     );
 
     // 5. Remove a senha do objeto antes de enviar a resposta
-    const { senha: _, ...userData } = usuario;
+    const { senha: _, id, ...userDataWithoutId } = usuario;
+    const userData = { ...userDataWithoutId, id_usuario: id };
 
     // 6. Retorna sucesso
     res.status(200).json({
@@ -112,3 +113,111 @@ export const cadastrarUsuario = async (req, res) => {
     res.status(500).json({ error: 'Erro ao cadastrar usuário' });
   }
 };
+
+export const updateUsuario = async (req, res) => {
+  const { id } = req.params;
+  const { nome, genero, dataNascimento, cpf, email, telefone, senha } = req.body;
+  let imagemBuffer = null;
+
+  try {
+    if (req.file) {
+      imagemBuffer = req.file.buffer;
+    }
+
+    // Se senha foi enviada, cria hash
+    let senhaHash;
+    if (senha) {
+      const salt = await bcrypt.genSalt(10);
+      senhaHash = await bcrypt.hash(senha, salt);
+    }
+
+    const query = `
+      UPDATE usuario 
+      SET 
+        nome = ?, 
+        genero = ?, 
+        dataNascimento = ?, 
+        cpf = ?, 
+        email = ?, 
+        telefone = ?,
+        ${senha ? 'senha = ?,' : ''}
+        ${imagemBuffer ? 'imagemPerfil = ?' : ''}
+      WHERE id_usuario = ?
+    `;
+
+    const params = [
+      nome, genero, dataNascimento, cpf, email, telefone,
+      ...(senha ? [senhaHash] : []),
+      ...(imagemBuffer ? [imagemBuffer] : []),
+      id
+    ].filter(Boolean);
+
+    await db.promise().query(query, params);
+
+    // Busca o usuário atualizado para retornar
+    const [updatedUser] = await db.promise().query(
+      'SELECT id_usuario, nome, genero, dataNascimento, email, telefone FROM usuario WHERE id_usuario = ?',
+      [id]
+    );
+
+    res.status(200).json(updatedUser[0]);
+  } catch (error) {
+    console.error('Erro ao atualizar usuário:', error);
+    res.status(500).json({ error: 'Erro ao atualizar usuário' });
+  }
+};
+
+export const deleteUsuario = async (req, res) => { 
+  const { id } = req.params;
+  
+  const q = "DELETE FROM usuario WHERE id_usuario = ?";
+  
+  db.query(q, [id], (err) => {
+      if (err) return res.status(500).json(err);
+      
+      return res.status(200).json("Usuário excluído com sucesso!");
+  });
+};
+
+export const getUsuarios = (_, res) => {
+  const q = "SELECT * FROM usuario";
+  
+  db.query(q, (err, data) => {
+      if (err) return res.status(500).json(err);
+      
+      // Formata a data para PT-BR
+      const usuarios = data.map(user => ({
+          ...user,
+          dataNascimento: new Date(user.dataNascimento).toLocaleDateString('pt-BR')
+      }));
+      
+      return res.status(200).json(usuarios);
+  });
+};
+
+export const getUsuarioById = async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const [rows] = await db.promise().query(
+      'SELECT * FROM usuario WHERE id_usuario = ?', 
+      [id]
+    );
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    // Formata a data para exibição
+    const usuario = {
+      ...rows[0],
+      dataNascimento: new Date(rows[0].dataNascimento).toLocaleDateString('pt-BR')
+    };
+
+    res.status(200).json(usuario);
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+    res.status(500).json({ error: 'Erro ao buscar usuário' });
+  }
+};
+
